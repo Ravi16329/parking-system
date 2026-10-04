@@ -1,0 +1,102 @@
+[
+  {
+    "id": "A1",
+    "status": "available",
+    "floor": 1
+  },
+  {
+    "id": "A2",
+    "status": "available",
+    "floor": 1
+  },
+  {
+    "id": "A3",
+    "status": "occupied",
+    "floor": 1
+  },
+  {
+    "id": "A4",
+    "status": "available",
+    "floor": 1
+  },
+  {
+    "id": "A5",
+    "status": "available",
+    "floor": 1
+  },
+  {
+    "id": "A6",
+    "status": "available",
+    "floor": 2
+  },
+  {
+    "id": "A7",
+    "status": "occupied",
+    "floor": 2
+  },
+  {
+    "id": "A8",
+    "status": "available",
+    "floor": 2
+  },
+  {
+    "id": "A9",
+    "status": "available",
+    "floor": 2
+  },
+  {
+    "id": "A10",
+    "status": "available",
+    "floor": 2
+  },
+  {
+    "id": "A11",
+    "status": "available",
+    "floor": 3
+  },
+  {
+    "id": "A12",
+    "status": "available",
+    "floor": 3
+  },
+  {
+    "id": "A13",
+    "status": "available",
+    "floor": 3
+  },
+  {
+    "id": "A14",
+    "status": "occupied",
+    "floor": 3
+  },
+  {
+    "id": "A15",
+    "status": "available",
+    "floor": 3
+  },
+  {
+    "id": "A16",
+    "status": "available",
+    "floor": 4
+  },
+  {
+    "id": "A17",
+    "status": "available",
+    "floor": 4
+  },
+  {
+    "id": "A18",
+    "status": "available",
+    "floor": 4
+  },
+  {
+    "id": "A19",
+    "status": "available",
+    "floor": 4
+  },
+  {
+    "id": "A20",
+    "status": "available",
+    "floor": 4
+  }
+]

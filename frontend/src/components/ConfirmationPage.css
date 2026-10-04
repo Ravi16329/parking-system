@@ -1,0 +1,111 @@
+.confirmation-card {
+  text-align: center;
+}
+
+.success-badge {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.qr-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+}
+
+.booking-summary {
+  text-align: left;
+  background: var(--color-bg);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.booking-summary div {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.95rem;
+}
+
+.booking-summary span {
+  color: var(--color-muted);
+}
+
+.status-confirmed {
+  color: var(--color-available);
+  text-transform: capitalize;
+}
+
+.history-block {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e6e9e7;
+  text-align: left;
+}
+
+.history-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--color-text);
+}
+
+.history-loading {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+
+.history-row strong {
+  margin-right: 8px;
+}
+
+.history-id {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+
+.history-status {
+  text-transform: capitalize;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.history-status.status-confirmed {
+  background: rgba(52, 168, 83, 0.14);
+  color: #1e7e34;
+}
+
+.history-status.status-held {
+  background: rgba(242, 183, 5, 0.16);
+  color: #8a6d00;
+}
+
+.history-status.status-cancelled {
+  background: rgba(227, 77, 77, 0.14);
+  color: #b3261e;
+}

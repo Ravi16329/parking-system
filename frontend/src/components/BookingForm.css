@@ -1,0 +1,432 @@
+/* =========================================================================
+   Booking / OTP page — "garage entry ticket" theme.
+
+   This is the ONLY stylesheet for these classes (there's no shared base
+   layer for .otp-row, .otp-box, .phone-field, .slot-banner, etc.), so every
+   rule here includes both structure (display, sizing, spacing) and theme
+   (color, font, borders) — not just color overrides.
+
+   Scoped under .page.booking-page / .card.booking-card so no other route
+   is affected.
+   ========================================================================= */
+
+.page.booking-page {
+    --tk-bg: #14171d;
+    --tk-paper: #f7f2e4;
+    --tk-ink: #232019;
+    --tk-muted: #8b8270;
+    --tk-line: #d9cfb2;
+    --tk-amber: #e2a13a;
+    --tk-amber-dark: #b97e21;
+    --tk-green: #2f9e5b;
+    --tk-red: #c9503f;
+    --tk-stub: #1c1f26;
+
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    background:
+        radial-gradient(ellipse 640px 420px at 50% 8%, rgba(226, 161, 58, 0.14), transparent 65%),
+        var(--tk-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* faint road-marking stripes in the background, echoing the 3D garage */
+.page.booking-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 86px,
+            rgba(255, 255, 255, 0.035) 86px,
+            rgba(255, 255, 255, 0.035) 90px);
+    pointer-events: none;
+}
+
+.page.booking-page .container {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ---- progress dots, restyled for the dark surroundings ---- */
+.page.booking-page .progress {
+    margin-bottom: 16px;
+}
+
+.page.booking-page .progress-step {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.page.booking-page .progress-step.active {
+    background: var(--tk-amber);
+}
+
+/* ---- the ticket card ---- */
+.card.booking-card {
+    background: var(--tk-paper);
+    color: var(--tk-ink);
+    border-radius: 6px;
+    padding: 26px 26px 28px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.65), 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+    position: relative;
+    overflow: hidden;
+}
+
+.card.booking-card .title {
+    color: var(--tk-ink);
+    font-size: 1.35rem;
+}
+
+.card.booking-card .subtitle {
+    color: var(--tk-muted);
+}
+
+/* ---- stub: the held-slot ticket header, sits inside the card ---- */
+.slot-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    margin: 0 0 22px;
+    background: linear-gradient(160deg, #262a33, var(--tk-stub));
+    border: none;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* dashed perforation along the bottom, like a tear-off stub */
+.slot-banner::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: -11px;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.14);
+}
+
+.slot-banner-tag {
+    min-width: 0;
+    width: auto;
+    padding: 0;
+    background: none;
+    color: var(--tk-amber);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: left;
+    line-height: 1;
+}
+
+.slot-banner-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.4;
+}
+
+.slot-banner-text strong {
+    color: #f3efe3;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.slot-banner-text span {
+    color: #9aa0a8;
+    font-size: 0.8rem;
+}
+
+/* ---- form fields ---- */
+.card.booking-card .form-group label {
+    color: var(--tk-ink);
+}
+
+.card.booking-card .form-group input {
+    background: #fffdf7;
+    border: 1px solid var(--tk-line);
+    color: var(--tk-ink);
+    border-radius: 6px;
+}
+
+.card.booking-card .form-group input:focus {
+    border-color: var(--tk-amber-dark);
+    box-shadow: 0 0 0 3px rgba(226, 161, 58, 0.18);
+}
+
+.card.booking-card .error-text {
+    color: var(--tk-red);
+}
+
+/* ---- phone field ---- */
+.phone-field {
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    background: #fffdf7;
+    border: 1px solid var(--tk-line);
+    border-radius: 6px;
+    transition: border-color 0.15s ease;
+}
+
+.phone-field:focus-within {
+    border-color: var(--tk-amber-dark);
+    box-shadow: 0 0 0 3px rgba(226, 161, 58, 0.18);
+}
+
+.phone-field.invalid {
+    border-color: var(--tk-red);
+}
+
+.phone-field .cc {
+    font-weight: 600;
+    color: var(--tk-muted);
+    padding-right: 10px;
+    border-right: 1px solid var(--tk-line);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.phone-field input {
+    border: none;
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    color: var(--tk-ink);
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    letter-spacing: 2px;
+    background: transparent;
+}
+
+.phone-field input:focus {
+    outline: none;
+}
+
+.phone-field .tick {
+    padding: 0 12px;
+    color: var(--tk-green);
+    font-weight: 700;
+}
+
+/* ---- primary button: boom-barrier amber ---- */
+.card.booking-card .btn-primary {
+    background: var(--tk-amber);
+    color: #1c1608;
+    border-radius: 6px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.card.booking-card .btn-primary:hover:not(:disabled) {
+    background: var(--tk-amber-dark);
+    color: #fff8ea;
+}
+
+.card.booking-card .btn-primary:disabled {
+    background: #ddd2ad;
+    color: #8b7f5c;
+}
+
+/* ---- link-style buttons ("Change", "Resend code") ---- */
+.link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: var(--tk-amber-dark);
+    cursor: pointer;
+}
+
+.link-btn:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
+.link-btn:disabled {
+    color: var(--tk-muted);
+    cursor: not-allowed;
+}
+
+/* ---- otp boxes: printed departure-board digits ---- */
+.otp-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin: 20px 0 10px;
+}
+
+.otp-row.busy {
+    opacity: 0.75;
+}
+
+.otp-box {
+    flex: 1;
+    min-width: 0;
+    height: 56px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    color: var(--tk-ink);
+    background: #fffdf7;
+    border: 1px solid var(--tk-line);
+    border-bottom-width: 3px;
+    border-radius: 6px;
+    transition: border-color 0.15s ease, transform 0.12s ease, background 0.15s ease;
+}
+
+.otp-box:focus {
+    outline: none;
+    border-color: var(--tk-amber-dark);
+    box-shadow: 0 0 0 3px rgba(226, 161, 58, 0.18);
+    transform: translateY(-2px);
+}
+
+.otp-box.filled {
+    border-color: var(--tk-amber-dark);
+    background: #fbf1da;
+}
+
+.otp-box.error {
+    border-color: var(--tk-red);
+}
+
+@keyframes otp-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-7px);
+    }
+
+    40% {
+        transform: translateX(7px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+.otp-row.shake {
+    animation: otp-shake 0.42s ease;
+}
+
+.otp-error {
+    margin-bottom: 4px;
+}
+
+.otp-status {
+    font-size: 0.85rem;
+    color: var(--tk-muted);
+    margin-bottom: 4px;
+}
+
+.otp-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 28px;
+    margin-bottom: 16px;
+    font-size: 0.87rem;
+}
+
+.otp-actions .muted {
+    color: var(--tk-muted);
+}
+
+.dev-hint {
+    font-size: 0.82rem;
+    color: #8a5f13;
+    background: rgba(226, 161, 58, 0.12);
+    border: 1px dashed rgba(226, 161, 58, 0.55);
+    border-radius: 8px;
+    padding: 9px 12px;
+    margin-bottom: 16px;
+}
+
+/* ---- verified state: an ink stamp, not a generic checkmark circle ---- */
+.verified-state {
+    text-align: center;
+    padding: 18px 0 8px;
+}
+
+@keyframes stamp-down {
+    0% {
+        transform: scale(2.4) rotate(-14deg);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(0.92) rotate(-8deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1) rotate(-8deg);
+    }
+}
+
+.verified-badge {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    line-height: 1;
+    margin: 0 auto 18px;
+    padding: 10px 22px;
+    border: 3px solid var(--tk-green);
+    border-radius: 6px;
+    color: var(--tk-green);
+    background: transparent;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    transform: rotate(-8deg);
+    animation: stamp-down 0.5s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .otp-row.shake,
+    .verified-badge {
+        animation: none;
+    }
+
+    .otp-box:focus {
+        transform: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .page.booking-page {
+        padding: 20px 12px;
+    }
+
+    .card.booking-card {
+        padding: 20px 18px 22px;
+    }
+
+    .otp-row {
+        gap: 6px;
+    }
+
+    .otp-box {
+        height: 50px;
+        font-size: 1.2rem;
+    }
+
+    .slot-banner-tag {
+        font-size: 1.5rem;
+    }
+}

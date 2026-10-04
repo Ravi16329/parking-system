@@ -1,0 +1,284 @@
+/* Completely restyled: a two-panel checkout layout instead of the old
+   single stacked card, built from the same design tokens as the rest of
+   the app (index.css :root) so it still feels like the same product. */
+
+.payment-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: radial-gradient(circle at top, #eef4f0 0%, var(--color-bg) 55%);
+}
+
+.payment-empty-card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  text-align: center;
+  max-width: 360px;
+}
+
+.payment-shell {
+  width: 100%;
+  max-width: 880px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--color-card);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(18, 79, 52, 0.12);
+  overflow: hidden;
+}
+
+/* ---------------- left: summary ---------------- */
+.payment-summary-panel {
+  padding: 36px 34px;
+  background: linear-gradient(165deg, #16382a 0%, #0f2a20 100%);
+  color: #eef6f1;
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-summary-panel .progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+}
+
+.payment-summary-panel .progress-step {
+  flex: 1;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.payment-summary-panel .progress-step.active {
+  background: var(--color-accent);
+}
+
+.test-mode-chip {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #0f2a20;
+  background: var(--color-accent);
+  padding: 5px 11px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.payment-summary-panel .title {
+  color: #fff;
+  font-size: 1.5rem;
+  margin: 0 0 4px;
+}
+
+.payment-summary-panel .subtitle {
+  color: rgba(238, 246, 241, 0.7);
+  font-size: 0.9rem;
+  margin: 0 0 28px;
+}
+
+.summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.summary-rows .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.92rem;
+}
+
+.summary-rows .row span {
+  color: rgba(238, 246, 241, 0.62);
+}
+
+.summary-rows .row strong {
+  font-weight: 600;
+}
+
+.amount-block {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amount-block span {
+  font-size: 0.8rem;
+  color: rgba(238, 246, 241, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.amount-block strong {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ---------------- right: action ---------------- */
+.payment-action-panel {
+  padding: 36px 34px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-heading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+  color: var(--color-text);
+}
+
+.method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.method-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 10px;
+  border: 2px solid #e1e7e3;
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.method-tile:hover:not(:disabled) {
+  border-color: #b7c7bd;
+}
+
+.method-tile:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.method-tile.selected {
+  border-color: var(--color-primary);
+  background: rgba(28, 110, 74, 0.06);
+  color: var(--color-primary-dark);
+}
+
+.method-tile:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.method-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pay-error {
+  background: #fdecec;
+  color: #b3261e;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+
+.btn-pay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btn-pay:hover:not(:disabled) {
+  opacity: 0.94;
+}
+
+.btn-pay:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.btn-pay:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: payspin 0.7s linear infinite;
+}
+
+@keyframes payspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.link-cancel {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 6px;
+}
+
+.link-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secure-note {
+  margin-top: auto;
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+@media (max-width: 720px) {
+  .payment-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-summary-panel,
+  .payment-action-panel {
+    padding: 28px 24px;
+  }
+
+  .amount-block {
+    margin-top: 20px;
+  }
+}
