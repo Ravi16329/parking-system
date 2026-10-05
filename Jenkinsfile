@@ -28,15 +28,40 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy Frontend') {
+            steps {
+                echo 'Deploying frontend to GitHub Pages...'
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'github-pat',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )
+                ]) {
+                    dir('frontend') {
+                        bat '''
+                            git config user.name "Jenkins"
+                            git config user.email "jenkins@localhost"
+
+                            git remote set-url origin https://%GIT_USER%:%GIT_TOKEN%@github.com/Ravi16329/parking-system.git
+
+                            npx gh-pages -d dist
+                        '''
+                    }
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'CI Pipeline completed successfully!'
+            echo 'CI/CD Pipeline completed successfully!'
         }
 
         failure {
-            echo 'CI Pipeline failed!'
+            echo 'CI/CD Pipeline failed!'
         }
     }
 }
