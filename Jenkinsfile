@@ -47,7 +47,7 @@ pipeline {
 
                             git remote set-url origin https://%GIT_USER%:%GIT_TOKEN%@github.com/Ravi16329/parking-system.git
 
-                            set CACHE_DIR=C:\gh-cache
+                            set "CACHE_DIR=C:\\gh-cache"
                             npx gh-pages -d build
                         '''
                     }
