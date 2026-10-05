@@ -238,7 +238,7 @@
 // backend's /api/otp endpoints are already live (OtpController) but the
 // frontend hasn't been switched over yet. Ask to wire that up separately.
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = "https://parking-system-ywfx.onrender.com/api";
 
 async function asJson(res) {
   const text = await res.text();

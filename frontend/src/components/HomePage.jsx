@@ -11,10 +11,16 @@ import "./HomePage.css";
    If a src fails to load, that slide automatically falls back to a
    placeholder card instead of a broken video.
 ===================================================================== */
+// const VIDEO_SOURCES = [
+//   { src: "/videos/video1parking.mp4", label: "Exterior view" },
+//   { src: "/videos/video2parking.mp4", label: "Main entrance" },
+//   { src: "/videos/video3parking.mp4", label: "Parking area" },
+// ];
+
 const VIDEO_SOURCES = [
-  { src: "/videos/video1parking.mp4", label: "Exterior view" },
-  { src: "/videos/video2parking.mp4", label: "Main entrance" },
-  { src: "/videos/video3parking.mp4", label: "Parking area" },
+  { src: `${process.env.PUBLIC_URL}/videos/video1parking.mp4`, label: "Exterior view" },
+  { src: `${process.env.PUBLIC_URL}/videos/video2parking.mp4`, label: "Main entrance" },
+  { src: `${process.env.PUBLIC_URL}/videos/video3parking.mp4`, label: "Parking area" },
 ];
 
 const ROTATE_MS = 7000;
