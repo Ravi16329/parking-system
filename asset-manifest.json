@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/parking-system/static/css/main.5a635c61.css",
-    "main.js": "/parking-system/static/js/main.c040f716.js",
+    "main.js": "/parking-system/static/js/main.edd3f7a9.js",
     "static/js/100.ec5ede8d.chunk.js": "/parking-system/static/js/100.ec5ede8d.chunk.js",
-    "static/js/1.ad2b6567.chunk.js": "/parking-system/static/js/1.ad2b6567.chunk.js",
-    "static/js/425.c742c2b9.chunk.js": "/parking-system/static/js/425.c742c2b9.chunk.js",
-    "static/js/531.5f2e7f3b.chunk.js": "/parking-system/static/js/531.5f2e7f3b.chunk.js",
+    "static/js/239.b5b36ca7.chunk.js": "/parking-system/static/js/239.b5b36ca7.chunk.js",
+    "static/js/977.ca270c52.chunk.js": "/parking-system/static/js/977.ca270c52.chunk.js",
+    "static/js/732.70748b60.chunk.js": "/parking-system/static/js/732.70748b60.chunk.js",
     "index.html": "/parking-system/index.html",
     "main.5a635c61.css.map": "/parking-system/static/css/main.5a635c61.css.map",
-    "main.c040f716.js.map": "/parking-system/static/js/main.c040f716.js.map",
-    "1.ad2b6567.chunk.js.map": "/parking-system/static/js/1.ad2b6567.chunk.js.map",
-    "425.c742c2b9.chunk.js.map": "/parking-system/static/js/425.c742c2b9.chunk.js.map",
-    "531.5f2e7f3b.chunk.js.map": "/parking-system/static/js/531.5f2e7f3b.chunk.js.map"
+    "main.edd3f7a9.js.map": "/parking-system/static/js/main.edd3f7a9.js.map",
+    "239.b5b36ca7.chunk.js.map": "/parking-system/static/js/239.b5b36ca7.chunk.js.map",
+    "977.ca270c52.chunk.js.map": "/parking-system/static/js/977.ca270c52.chunk.js.map",
+    "732.70748b60.chunk.js.map": "/parking-system/static/js/732.70748b60.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5a635c61.css",
-    "static/js/main.c040f716.js"
+    "static/js/main.edd3f7a9.js"
   ]
 }
