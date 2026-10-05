@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/parking-system/static/css/main.5a635c61.css",
-    "main.js": "/parking-system/static/js/main.f7870906.js",
+    "main.js": "/parking-system/static/js/main.c040f716.js",
     "static/js/100.ec5ede8d.chunk.js": "/parking-system/static/js/100.ec5ede8d.chunk.js",
     "static/js/1.ad2b6567.chunk.js": "/parking-system/static/js/1.ad2b6567.chunk.js",
     "static/js/425.c742c2b9.chunk.js": "/parking-system/static/js/425.c742c2b9.chunk.js",
     "static/js/531.5f2e7f3b.chunk.js": "/parking-system/static/js/531.5f2e7f3b.chunk.js",
     "index.html": "/parking-system/index.html",
     "main.5a635c61.css.map": "/parking-system/static/css/main.5a635c61.css.map",
-    "main.f7870906.js.map": "/parking-system/static/js/main.f7870906.js.map",
+    "main.c040f716.js.map": "/parking-system/static/js/main.c040f716.js.map",
     "1.ad2b6567.chunk.js.map": "/parking-system/static/js/1.ad2b6567.chunk.js.map",
     "425.c742c2b9.chunk.js.map": "/parking-system/static/js/425.c742c2b9.chunk.js.map",
     "531.5f2e7f3b.chunk.js.map": "/parking-system/static/js/531.5f2e7f3b.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5a635c61.css",
-    "static/js/main.f7870906.js"
+    "static/js/main.c040f716.js"
   ]
 }
