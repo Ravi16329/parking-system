@@ -47,7 +47,7 @@ pipeline {
 
                             git remote set-url origin https://%GIT_USER%:%GIT_TOKEN%@github.com/Ravi16329/parking-system.git
 
-                            npx gh-pages -d dist
+                            npx gh-pages -d build
                         '''
                     }
                 }
