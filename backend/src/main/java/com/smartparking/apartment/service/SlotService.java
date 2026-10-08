@@ -1,8 +1,9 @@
 package com.smartparking.apartment.service;
 
-import com.smartparking.apartment.entity.Slot;
-
 import java.util.List;
+
+import com.smartparking.apartment.entity.Booking;
+import com.smartparking.apartment.entity.Slot;
 
 public interface SlotService {
 
@@ -38,4 +39,6 @@ public interface SlotService {
 
     /** Marks a slot OCCUPIED once payment/booking is confirmed. */
     void markOccupied(String slotId);
+
+    Booking adminBookSlot(String slotId, String name, String phone);
 }

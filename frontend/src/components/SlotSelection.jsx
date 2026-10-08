@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { getSlots, holdSlot } from "../api/api";
+import { getSlots, holdSlot, releaseSlot, HOLD_MINUTES } from "../api/api";
+import HoldCountdown from "./HoldCountdown";
 import "./SlotSelection.css";
 
 const REFRESH_MS = 6000; // how often to re-poll slot status from the backend
@@ -299,7 +300,12 @@ function buildGarage() {
   return group;
 }
 
-export default function SlotSelection({ selectedSlotId, setSelectedSlotId }) {
+export default function SlotSelection({
+  selectedSlotId,
+  setSelectedSlotId,
+  holdExpiresAt,
+  setHoldExpiresAt,
+}) {
   const navigate = useNavigate();
 
   const mountRef = useRef(null);
@@ -375,12 +381,39 @@ export default function SlotSelection({ selectedSlotId, setSelectedSlotId }) {
       setHoldError(null);
       setAllSlots((prev) => prev.map((s) => (s.id === slot.id ? { ...s, status: "held" } : s)));
       setSelectedSlotId(slot.id);
+
+      // Use the browser's own clock as the reference point, not the
+      // server's heldAt string: Java's LocalDateTime serializes with no
+      // timezone marker (e.g. "2026-10-08T05:00:00"), and JS's Date parser
+      // treats a marker-less string as *local* time rather than UTC — on a
+      // backend running in a different zone than the browser, that silently
+      // shifts the computed expiry by hours. A few hundred ms of network
+      // latency against a multi-minute hold window doesn't matter here.
+      setHoldExpiresAt(Date.now() + HOLD_MINUTES * 60 * 1000);
     },
-    [setSelectedSlotId]
+    [setSelectedSlotId, setHoldExpiresAt]
   );
   useEffect(() => {
     handleSelectRef.current = handleSelect;
   }, [handleSelect]);
+
+  // Countdown ran out while still on this page (never clicked Continue) —
+  // the backend will have already released it, so just reset locally.
+  const handleHoldExpire = useCallback(() => {
+    setHoldError("Your hold expired — pick a bay again.");
+    setSelectedSlotId(null);
+    setHoldExpiresAt(null);
+    getSlots().then((data) => Array.isArray(data) && setAllSlots(data));
+  }, [setSelectedSlotId, setHoldExpiresAt]);
+
+  async function handleBack() {
+    if (selectedSlotId) {
+      await releaseSlot(selectedSlotId);
+      setSelectedSlotId(null);
+      setHoldExpiresAt(null);
+    }
+    navigate("/");
+  }
 
   useEffect(() => {
     if (!holdError) return;
@@ -591,6 +624,9 @@ export default function SlotSelection({ selectedSlotId, setSelectedSlotId }) {
     <div className="page slot3d-page">
       <div className="slot3d-overlay">
         <div className="slot3d-header">
+          <button type="button" className="slot3d-back-btn" onClick={handleBack}>
+            ← Back
+          </button>
           <h1 className="title">Select a Slot</h1>
           <p className="subtitle">Drag to look around · Click a green bay to reserve it</p>
         </div>
@@ -623,6 +659,9 @@ export default function SlotSelection({ selectedSlotId, setSelectedSlotId }) {
       <div className="slot3d-footer">
         <div className="selected-info">
           {selectedSlot ? `Selected: ${selectedSlot.id} (Floor ${selectedSlot.floor})` : "No slot selected yet"}
+          {selectedSlot && (
+            <HoldCountdown expiresAt={holdExpiresAt} onExpire={handleHoldExpire} />
+          )}
         </div>
         <button className="btn btn-primary" disabled={!selectedSlotId} onClick={handleContinue}>
           Continue

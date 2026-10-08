@@ -18,6 +18,10 @@ import AdminDashboard from "./components/AdminDashboard";
 export default function App() {
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [booking, setBooking] = useState(null); // { bookingId, slotId, name, phone, status, createdAt }
+  // Timestamp (ms) the current hold expires at — set the moment a bay is
+  // held in SlotSelection, read by the countdown on every step until
+  // payment completes (or the hold is released/expires).
+  const [holdExpiresAt, setHoldExpiresAt] = useState(null);
 
   return (
     <HashRouter>
@@ -29,6 +33,8 @@ export default function App() {
             <SlotSelection
               selectedSlotId={selectedSlotId}
               setSelectedSlotId={setSelectedSlotId}
+              holdExpiresAt={holdExpiresAt}
+              setHoldExpiresAt={setHoldExpiresAt}
             />
           }
         />
@@ -37,8 +43,11 @@ export default function App() {
           element={
             <BookingForm
               selectedSlotId={selectedSlotId}
+              setSelectedSlotId={setSelectedSlotId}
               booking={booking}
               setBooking={setBooking}
+              holdExpiresAt={holdExpiresAt}
+              setHoldExpiresAt={setHoldExpiresAt}
             />
           }
         />
@@ -49,6 +58,8 @@ export default function App() {
               booking={booking}
               setBooking={setBooking}
               setSelectedSlotId={setSelectedSlotId}
+              holdExpiresAt={holdExpiresAt}
+              setHoldExpiresAt={setHoldExpiresAt}
             />
           }
         />

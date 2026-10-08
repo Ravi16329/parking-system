@@ -1,13 +1,39 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createBooking, sendOtp, verifyOtp } from "../api/api";
+import { createBooking, sendOtp, verifyOtp, releaseSlot } from "../api/api";
+import HoldCountdown from "./HoldCountdown";
 import "./BookingForm.css";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 30;
 
-export default function BookingForm({ selectedSlotId, booking, setBooking }) {
+export default function BookingForm({
+  selectedSlotId,
+  setSelectedSlotId,
+  booking,
+  setBooking,
+  holdExpiresAt,
+  setHoldExpiresAt,
+}) {
   const navigate = useNavigate();
+  const [expired, setExpired] = useState(false);
+
+  const handleHoldExpire = useCallback(() => {
+    setExpired(true);
+  }, []);
+
+  async function handleBack() {
+    if (selectedSlotId) await releaseSlot(selectedSlotId);
+    setSelectedSlotId?.(null);
+    setHoldExpiresAt?.(null);
+    navigate("/slots");
+  }
+
+  function handlePickNewSlot() {
+    setSelectedSlotId?.(null);
+    setHoldExpiresAt?.(null);
+    navigate("/slots");
+  }
 
   const [step, setStep] = useState("details"); // details | otp | done
   const [name, setName] = useState(booking?.name || "");
@@ -83,6 +109,24 @@ export default function BookingForm({ selectedSlotId, booking, setBooking }) {
             <h1 className="title">No slot selected</h1>
             <p className="subtitle">Pick a bay in the garage first, then come back here.</p>
             <button className="btn btn-primary" onClick={() => navigate("/slots")}>
+              Choose a slot
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (expired && step !== "done") {
+    return (
+      <div className="page booking-page">
+        <div className="container">
+          <div className="card">
+            <h1 className="title">Your hold expired</h1>
+            <p className="subtitle">
+              {selectedSlotId} wasn't confirmed in time, so it's been released back to the garage.
+            </p>
+            <button className="btn btn-primary btn-block" onClick={handlePickNewSlot}>
               Choose a slot
             </button>
           </div>
@@ -181,6 +225,10 @@ export default function BookingForm({ selectedSlotId, booking, setBooking }) {
     <div className="page booking-page">
       <div className="container">
         <div className="card booking-card">
+          <button type="button" className="booking-back-btn" onClick={handleBack}>
+            ← Back
+          </button>
+
           <div className="progress">
             <span className="progress-step active" />
             <span className="progress-step active" />
@@ -194,6 +242,9 @@ export default function BookingForm({ selectedSlotId, booking, setBooking }) {
               <strong>Bay held for you</strong>
               <span>Finish verification to keep it</span>
             </div>
+            {step !== "done" && (
+              <HoldCountdown expiresAt={holdExpiresAt} onExpire={handleHoldExpire} label="Expires in" />
+            )}
           </div>
 
           {step === "details" && (

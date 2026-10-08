@@ -207,3 +207,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.admin-book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-book-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.admin-book-form input,
+.admin-book-form select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d8ddda;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.admin-success {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(46, 204, 113, 0.15);
+  color: #1e8449;
+  font-weight: 600;
+}

@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getSlots,
   adminReleaseSlot,
+  adminBookSlot,
   getAnnouncements,
   adminPostAnnouncement,
   adminDeleteAnnouncement,
@@ -10,13 +11,22 @@ import {
 } from "../api/api";
 import "./AdminDashboard.css";
 
+const byId = (a, b) => a.id.localeCompare(b.id, undefined, { numeric: true });
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [token] = useState(() => sessionStorage.getItem("adminToken"));
 
-  const [slots, setSlots] = useState([]);
+  const [allSlots, setAllSlots] = useState([]);
   const [slotsLoading, setSlotsLoading] = useState(true);
   const [releasingId, setReleasingId] = useState(null);
+
+  // walk-in booking form
+  const [bookSlotId, setBookSlotId] = useState("");
+  const [bookName, setBookName] = useState("");
+  const [bookPhone, setBookPhone] = useState("");
+  const [booking, setBooking] = useState(false);
+  const [bookSuccess, setBookSuccess] = useState("");
 
   const [announcements, setAnnouncements] = useState([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
@@ -25,6 +35,16 @@ export default function AdminDashboard() {
   const [deletingId, setDeletingId] = useState(null);
 
   const [error, setError] = useState("");
+
+  // held/occupied bays the admin may need to release, and free bays they can book
+  const attentionSlots = useMemo(
+    () => allSlots.filter((s) => s.status !== "available").sort(byId),
+    [allSlots]
+  );
+  const freeSlots = useMemo(
+    () => allSlots.filter((s) => s.status === "available").sort(byId),
+    [allSlots]
+  );
 
   const handleAuthError = useCallback(
     (err) => {
@@ -41,7 +61,7 @@ export default function AdminDashboard() {
   const loadSlots = useCallback(() => {
     setSlotsLoading(true);
     getSlots()
-      .then((all) => setSlots(all.filter((s) => s.status !== "available")))
+      .then((all) => setAllSlots(Array.isArray(all) ? all : []))
       .catch(() => setError("Couldn't load slots."))
       .finally(() => setSlotsLoading(false));
   }, []);
@@ -67,13 +87,55 @@ export default function AdminDashboard() {
     if (releasingId) return;
     setReleasingId(slotId);
     setError("");
+    setBookSuccess("");
     try {
       await adminReleaseSlot(slotId, token);
-      setSlots((prev) => prev.filter((s) => s.id !== slotId));
+      // freed bay goes back to "available", so it shows up in the booking dropdown
+      setAllSlots((prev) =>
+        prev.map((s) => (s.id === slotId ? { ...s, status: "available" } : s))
+      );
     } catch (err) {
       if (!handleAuthError(err)) setError(err.message || "Couldn't release that slot.");
     } finally {
       setReleasingId(null);
+    }
+  }
+
+  async function handleBook(e) {
+    e.preventDefault();
+    if (booking) return;
+    setError("");
+    setBookSuccess("");
+
+    if (!bookSlotId) return setError("Pick a free slot first.");
+    if (!bookName.trim()) return setError("Enter the driver's name.");
+    if (!/^[0-9]{10}$/.test(bookPhone.trim())) {
+      return setError("Enter a valid 10-digit phone number.");
+    }
+
+    setBooking(true);
+    try {
+      const result = await adminBookSlot(
+        bookSlotId,
+        { name: bookName.trim(), phone: bookPhone.trim() },
+        token
+      );
+      setAllSlots((prev) =>
+        prev.map((s) => (s.id === bookSlotId ? { ...s, status: "occupied" } : s))
+      );
+      setBookSuccess(
+        `Slot ${bookSlotId} booked for ${bookName.trim()} (Booking ${result.bookingId}).`
+      );
+      setBookSlotId("");
+      setBookName("");
+      setBookPhone("");
+    } catch (err) {
+      if (!handleAuthError(err)) {
+        setError(err.message || "Couldn't book that slot.");
+        loadSlots(); // someone may have taken it; refresh the list
+      }
+    } finally {
+      setBooking(false);
     }
   }
 
@@ -120,7 +182,7 @@ export default function AdminDashboard() {
       <div className="admin-header">
         <div>
           <h1 className="title">Admin Dashboard</h1>
-          <p className="subtitle">Manage held/occupied slots and site announcements</p>
+          <p className="subtitle">Book walk-in slots, manage held/occupied slots, and post announcements</p>
         </div>
         <button className="btn btn-secondary" onClick={handleLogout}>
           Log Out
@@ -128,39 +190,91 @@ export default function AdminDashboard() {
       </div>
 
       {error && <div className="admin-error">{error}</div>}
+      {bookSuccess && <div className="admin-success">{bookSuccess}</div>}
 
       <div className="admin-grid">
-        {/* ---------------- slots needing attention ---------------- */}
+        {/* ---------------- walk-in booking ---------------- */}
         <section className="admin-card">
           <h2 className="admin-card-heading">
-            Held / occupied slots
-            {!slotsLoading && <span className="admin-count">{slots.length}</span>}
+            Book a slot (walk-in)
+            {!slotsLoading && <span className="admin-count">{freeSlots.length} free</span>}
           </h2>
 
           {slotsLoading ? (
             <p className="admin-muted">Loading…</p>
-          ) : slots.length === 0 ? (
+          ) : freeSlots.length === 0 ? (
+            <p className="admin-muted">No free bays right now.</p>
+          ) : (
+            <form className="admin-book-form" onSubmit={handleBook}>
+              <label>
+                Slot
+                <select value={bookSlotId} onChange={(e) => setBookSlotId(e.target.value)}>
+                  <option value="">Select a free slot…</option>
+                  {freeSlots.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.id} — Floor {s.floor}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Driver name
+                <input
+                  type="text"
+                  value={bookName}
+                  onChange={(e) => setBookName(e.target.value)}
+                  placeholder="Rahul Sharma"
+                />
+              </label>
+
+              <label>
+                Phone number
+                <input
+                  type="tel"
+                  value={bookPhone}
+                  onChange={(e) => setBookPhone(e.target.value)}
+                  placeholder="9876543210"
+                  maxLength={10}
+                />
+              </label>
+
+              <button className="btn btn-primary" type="submit" disabled={booking}>
+                {booking ? "Booking…" : "Book slot"}
+              </button>
+            </form>
+          )}
+        </section>
+
+        {/* ---------------- slots needing attention ---------------- */}
+        <section className="admin-card">
+          <h2 className="admin-card-heading">
+            Held / occupied slots
+            {!slotsLoading && <span className="admin-count">{attentionSlots.length}</span>}
+          </h2>
+
+          {slotsLoading ? (
+            <p className="admin-muted">Loading…</p>
+          ) : attentionSlots.length === 0 ? (
             <p className="admin-muted">Nothing to manage right now — every bay is free.</p>
           ) : (
             <ul className="admin-slot-list">
-              {slots
-                .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }))
-                .map((slot) => (
-                  <li key={slot.id} className="admin-slot-row">
-                    <div className="admin-slot-info">
-                      <strong>{slot.id}</strong>
-                      <span className="admin-slot-floor">Floor {slot.floor}</span>
-                      <span className={`admin-slot-badge status-${slot.status}`}>{slot.status}</span>
-                    </div>
-                    <button
-                      className="btn btn-secondary btn-sm"
-                      onClick={() => handleRelease(slot.id)}
-                      disabled={releasingId === slot.id}
-                    >
-                      {releasingId === slot.id ? "Releasing…" : "Release"}
-                    </button>
-                  </li>
-                ))}
+              {attentionSlots.map((slot) => (
+                <li key={slot.id} className="admin-slot-row">
+                  <div className="admin-slot-info">
+                    <strong>{slot.id}</strong>
+                    <span className="admin-slot-floor">Floor {slot.floor}</span>
+                    <span className={`admin-slot-badge status-${slot.status}`}>{slot.status}</span>
+                  </div>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => handleRelease(slot.id)}
+                    disabled={releasingId === slot.id}
+                  >
+                    {releasingId === slot.id ? "Releasing…" : "Release"}
+                  </button>
+                </li>
+              ))}
             </ul>
           )}
         </section>

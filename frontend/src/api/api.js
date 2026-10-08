@@ -240,6 +240,11 @@
 
 const BASE_URL = "https://parking-system-ywfx.onrender.com/api";
 
+// Must mirror the backend's app.slot.hold-minutes (application.properties).
+// Used client-side only to render the countdown — the backend is always the
+// real source of truth for when a hold actually expires.
+export const HOLD_MINUTES = 3;
+
 async function asJson(res) {
   const text = await res.text();
   return text ? JSON.parse(text) : null;
@@ -446,6 +451,19 @@ export async function adminReleaseSlot(slotId, token) {
   if (res.status === 401) throw new Error("UNAUTHORIZED");
   if (!res.ok) throw new Error("Couldn't release that slot.");
   return true;
+}
+
+/** Admin walk-in booking: marks a free slot occupied and records who it's for. */
+export async function adminBookSlot(slotId, { name, phone }, token) {
+  const res = await fetch(`${BASE_URL}/admin/slots/${slotId}/book`, {
+    method: "POST",
+    headers: adminHeaders(token, true),
+    body: JSON.stringify({ name, phone }),
+  });
+  const data = await asJson(res).catch(() => null);
+  if (res.status === 401) throw new Error("UNAUTHORIZED");
+  if (!res.ok) throw new Error(data?.message || `Couldn't book that slot (HTTP ${res.status}).`);
+  return normalizeBooking(data);
 }
 
 /** Public — anyone can read the posted announcements (e.g. the home page). */

@@ -87,10 +87,30 @@
     color: var(--tk-muted);
 }
 
+.booking-back-btn {
+    display: inline-flex;
+    align-self: flex-start;
+    margin-bottom: 14px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--tk-line);
+    background: transparent;
+    color: var(--tk-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.booking-back-btn:hover {
+    color: var(--tk-ink);
+    border-color: var(--tk-ink);
+}
+
 /* ---- stub: the held-slot ticket header, sits inside the card ---- */
 .slot-banner {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 16px;
     padding: 16px 18px;
     margin: 0 0 22px;

@@ -151,9 +151,31 @@
 }
 
 .selected-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
   color: #e5e9f0;
   font-size: 0.95rem;
   font-weight: 600;
+}
+
+.slot3d-back-btn {
+  pointer-events: auto;
+  align-self: flex-start;
+  margin-bottom: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e5e9f0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.slot3d-back-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .slot3d-footer .btn {

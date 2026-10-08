@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { payForBooking, releaseSlot } from "../api/api";
+import HoldCountdown from "./HoldCountdown";
 import "./PaymentPage.css";
 
 const AMOUNT = 50;
@@ -32,12 +33,21 @@ function LockIcon() {
   );
 }
 
-export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) {
+export default function PaymentPage({
+  booking,
+  setBooking,
+  setSelectedSlotId,
+  holdExpiresAt,
+  setHoldExpiresAt,
+}) {
   const navigate = useNavigate();
   const [method, setMethod] = useState("UPI");
   const [processing, setProcessing] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [payError, setPayError] = useState("");
+  const [expired, setExpired] = useState(false);
+
+  const handleHoldExpire = useCallback(() => setExpired(true), []);
 
   if (!booking) {
     return (
@@ -46,6 +56,30 @@ export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) 
           <p>No booking in progress.</p>
           <button className="btn btn-primary" onClick={() => navigate("/slots")}>
             Start a Booking
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (expired) {
+    return (
+      <div className="payment-page">
+        <div className="payment-empty-card">
+          <p>
+            Your hold on <strong>{booking.slotId}</strong> expired before payment completed, so
+            it's been released back to the garage.
+          </p>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setBooking(null);
+              setSelectedSlotId?.(null);
+              setHoldExpiresAt?.(null);
+              navigate("/slots");
+            }}
+          >
+            Choose a slot
           </button>
         </div>
       </div>
@@ -67,6 +101,7 @@ export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) 
       // instead of just { bookingId, method }.
       const result = await payForBooking({ bookingId: booking.bookingId, method });
       setBooking({ ...booking, ...result });
+      setHoldExpiresAt?.(null); // paid — the slot is OCCUPIED now, not HELD
       navigate("/confirmation");
     } catch (err) {
       setPayError("Payment failed — please try again.");
@@ -83,6 +118,7 @@ export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) 
     await releaseSlot(booking.slotId);
     setBooking(null);
     setSelectedSlotId?.(null);
+    setHoldExpiresAt?.(null);
     navigate("/slots");
   }
 
@@ -91,6 +127,10 @@ export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) 
       <div className="payment-shell">
         {/* ---------------- left: order summary ---------------- */}
         <div className="payment-summary-panel">
+          <button type="button" className="payment-back-btn" onClick={handleCancel} disabled={processing || cancelling}>
+            ← Back
+          </button>
+
           <div className="progress">
             <span className="progress-step active" />
             <span className="progress-step active" />
@@ -98,7 +138,10 @@ export default function PaymentPage({ booking, setBooking, setSelectedSlotId }) 
             <span className="progress-step" />
           </div>
 
-          <span className="test-mode-chip">Test mode · no real charge</span>
+          <div className="panel-chip-row">
+            <span className="test-mode-chip">Test mode · no real charge</span>
+            <HoldCountdown expiresAt={holdExpiresAt} onExpire={handleHoldExpire} />
+          </div>
 
           <h1 className="title">Confirm &amp; pay</h1>
           <p className="subtitle">Review your reservation before paying</p>
