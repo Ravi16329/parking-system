@@ -42,6 +42,20 @@
         <scope>runtime</scope>
     </dependency>
 
+    <!-- Razorpay -->
+    <dependency>
+        <groupId>com.razorpay</groupId>
+        <artifactId>razorpay-java</artifactId>
+        <version>1.4.8</version>
+    </dependency>
+
+    <!-- JSON -->
+    <dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20250517</version>
+    </dependency>
+
     <!-- Validation -->
     <dependency>
         <groupId>org.springframework.boot</groupId>

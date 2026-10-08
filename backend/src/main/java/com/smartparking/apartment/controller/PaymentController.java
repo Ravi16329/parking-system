@@ -1,9 +1,7 @@
 package com.smartparking.apartment.controller;
 
-import com.smartparking.apartment.dto.PaymentRequest;
-import com.smartparking.apartment.entity.Booking;
-import com.smartparking.apartment.service.PaymentService;
-import jakarta.validation.Valid;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.NoSuchElementException;
+import com.smartparking.apartment.dto.PaymentOrderRequest;
+import com.smartparking.apartment.dto.PaymentOrderResponse;
+import com.smartparking.apartment.dto.PaymentRequest;
+import com.smartparking.apartment.entity.Booking;
+import com.smartparking.apartment.service.PaymentService;
 
-/**
- * POST /api/payments -> simulate a dummy payment for a booking (UPI/Card).
- * Dummy for now — swap PaymentServiceImpl's body for a real Razorpay
- * order-verify call when that's wired in; this endpoint's contract
- * (booking in, confirmed booking out) doesn't need to change.
- */
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -26,13 +24,36 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping
-    public ResponseEntity<Booking> pay(@Valid @RequestBody PaymentRequest request) {
+    // Create Razorpay order
+    @PostMapping("/order")
+    public ResponseEntity<PaymentOrderResponse> createOrder(
+            @Valid @RequestBody PaymentOrderRequest request) {
+
         try {
-            return ResponseEntity.ok(paymentService.processDummyPayment(request));
+            return ResponseEntity.ok(
+                    paymentService.createOrder(request)
+            );
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // Old dummy payment endpoint - kept temporarily
+    @PostMapping
+    public ResponseEntity<Booking> pay(
+            @Valid @RequestBody PaymentRequest request) {
+
+        try {
+            return ResponseEntity.ok(
+                    paymentService.processDummyPayment(request)
+            );
+
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
-
 }

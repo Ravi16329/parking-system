@@ -1,23 +1,25 @@
 package com.smartparking.apartment.service.impl;
 
+import com.razorpay.Order;
+import com.razorpay.RazorpayClient;
+import com.smartparking.apartment.dto.PaymentOrderRequest;
+import com.smartparking.apartment.dto.PaymentOrderResponse;
 import com.smartparking.apartment.dto.PaymentRequest;
 import com.smartparking.apartment.entity.Booking;
+import com.smartparking.apartment.entity.Payment;
 import com.smartparking.apartment.repository.BookingRepository;
+import com.smartparking.apartment.repository.PaymentRepository;
 import com.smartparking.apartment.service.PaymentService;
 import com.smartparking.apartment.service.SlotService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
-/**
- * Dummy payment gateway — always "succeeds". Swap the body of
- * processDummyPayment for a real Razorpay order-verify call when that's
- * wired in: create the order in PaymentController (or a new endpoint) before
- * checkout opens, then here verify the returned razorpay_payment_id /
- * razorpay_signature instead of unconditionally confirming.
- */
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -25,28 +27,82 @@ public class PaymentServiceImpl implements PaymentService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private SlotService slotService;
+
+    @Autowired
+    private RazorpayClient razorpayClient;
+
+    @Value("${razorpay.key.id}")
+    private String razorpayKeyId;
+
+    // ₹50 parking fee
+    private static final int AMOUNT_IN_PAISE = 5000;
+
+    @Override
+    @Transactional
+    public PaymentOrderResponse createOrder(PaymentOrderRequest request) {
+
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "No such booking: " + request.getBookingId()));
+
+        try {
+            // Razorpay amount is in paise
+            JSONObject orderRequest = new JSONObject();
+
+            orderRequest.put("amount", AMOUNT_IN_PAISE);
+            orderRequest.put("currency", "INR");
+            orderRequest.put("receipt", booking.getBookingId());
+
+            Order razorpayOrder = razorpayClient.orders.create(orderRequest);
+
+            String razorpayOrderId = razorpayOrder.get("id");
+
+            // Save payment record in PostgreSQL
+            Payment payment = new Payment(
+                    booking.getBookingId(),
+                    BigDecimal.valueOf(50),
+                    "RAZORPAY"
+            );
+
+            payment.setRazorpayOrderId(razorpayOrderId);
+            payment.setStatus(Payment.Status.CREATED);
+
+            paymentRepository.save(payment);
+
+            return new PaymentOrderResponse(
+                    razorpayOrderId,
+                    razorpayKeyId,
+                    booking.getBookingId(),
+                    AMOUNT_IN_PAISE,
+                    "INR"
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to create Razorpay order: " + e.getMessage(), e);
+        }
+    }
 
     @Override
     @Transactional
     public Booking processDummyPayment(PaymentRequest request) {
+
         Booking booking = bookingRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new NoSuchElementException("No such booking: " + request.getBookingId()));
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "No such booking: " + request.getBookingId()));
 
-        // ---- Razorpay goes here later -------------------------------------
-        // e.g. RazorpayClient client = new RazorpayClient(keyId, keySecret);
-        // Utils.verifyPaymentSignature(params, keySecret); // throws if invalid
-        // For now: dummy gateway, always succeeds.
-        // ---------------------------------------------------------------------
-
+        // Dummy payment remains temporarily.
         booking.setStatus(Booking.Status.CONFIRMED);
         bookingRepository.save(booking);
 
-        // Marks the slot OCCUPIED and clears its hold timer, so it isn't
-        // swept back to AVAILABLE by the hold-timeout job.
         slotService.markOccupied(booking.getSlotId());
 
         return booking;
     }
-
 }
