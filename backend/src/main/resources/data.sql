@@ -1,48 +1,241 @@
 -- Seed data: 4 floors x 100 slots each (400 total), all AVAILABLE at start.
+
 -- Floor 1 = A1-A100, Floor 2 = B1-B100, Floor 3 = C1-C100, Floor 4 = D1-D100,
 -- matching the 10x10-per-floor 3D grid in SlotSelection.jsx.
 
+
+-- =========================================================
+-- APARTMENT
+-- =========================================================
+
 INSERT INTO apartment (id, name, address, total_slots, image) VALUES
-  (1, 'Green Meadows Apartments', '12 Lakeview Road, Vijayawada', 400, 'apartment.jpg');
+(1, 'Green Meadows Apartments', '12 Lakeview Road, Vijayawada', 400, 'apartment.jpg')
+ON CONFLICT DO NOTHING;
+
+
+-- =========================================================
+-- PARKING SLOTS
+-- =========================================================
 
 INSERT INTO slot (id, status, floor) VALUES
-  ('A1', 'AVAILABLE', 1), ('A2', 'AVAILABLE', 1), ('A3', 'AVAILABLE', 1), ('A4', 'AVAILABLE', 1), ('A5', 'AVAILABLE', 1), ('A6', 'AVAILABLE', 1), ('A7', 'AVAILABLE', 1), ('A8', 'AVAILABLE', 1), ('A9', 'AVAILABLE', 1), ('A10', 'AVAILABLE', 1),
-  ('A11', 'AVAILABLE', 1), ('A12', 'AVAILABLE', 1), ('A13', 'AVAILABLE', 1), ('A14', 'AVAILABLE', 1), ('A15', 'AVAILABLE', 1), ('A16', 'AVAILABLE', 1), ('A17', 'AVAILABLE', 1), ('A18', 'AVAILABLE', 1), ('A19', 'AVAILABLE', 1), ('A20', 'AVAILABLE', 1),
-  ('A21', 'AVAILABLE', 1), ('A22', 'AVAILABLE', 1), ('A23', 'AVAILABLE', 1), ('A24', 'AVAILABLE', 1), ('A25', 'AVAILABLE', 1), ('A26', 'AVAILABLE', 1), ('A27', 'AVAILABLE', 1), ('A28', 'AVAILABLE', 1), ('A29', 'AVAILABLE', 1), ('A30', 'AVAILABLE', 1),
-  ('A31', 'AVAILABLE', 1), ('A32', 'AVAILABLE', 1), ('A33', 'AVAILABLE', 1), ('A34', 'AVAILABLE', 1), ('A35', 'AVAILABLE', 1), ('A36', 'AVAILABLE', 1), ('A37', 'AVAILABLE', 1), ('A38', 'AVAILABLE', 1), ('A39', 'AVAILABLE', 1), ('A40', 'AVAILABLE', 1),
-  ('A41', 'AVAILABLE', 1), ('A42', 'AVAILABLE', 1), ('A43', 'AVAILABLE', 1), ('A44', 'AVAILABLE', 1), ('A45', 'AVAILABLE', 1), ('A46', 'AVAILABLE', 1), ('A47', 'AVAILABLE', 1), ('A48', 'AVAILABLE', 1), ('A49', 'AVAILABLE', 1), ('A50', 'AVAILABLE', 1),
-  ('A51', 'AVAILABLE', 1), ('A52', 'AVAILABLE', 1), ('A53', 'AVAILABLE', 1), ('A54', 'AVAILABLE', 1), ('A55', 'AVAILABLE', 1), ('A56', 'AVAILABLE', 1), ('A57', 'AVAILABLE', 1), ('A58', 'AVAILABLE', 1), ('A59', 'AVAILABLE', 1), ('A60', 'AVAILABLE', 1),
-  ('A61', 'AVAILABLE', 1), ('A62', 'AVAILABLE', 1), ('A63', 'AVAILABLE', 1), ('A64', 'AVAILABLE', 1), ('A65', 'AVAILABLE', 1), ('A66', 'AVAILABLE', 1), ('A67', 'AVAILABLE', 1), ('A68', 'AVAILABLE', 1), ('A69', 'AVAILABLE', 1), ('A70', 'AVAILABLE', 1),
-  ('A71', 'AVAILABLE', 1), ('A72', 'AVAILABLE', 1), ('A73', 'AVAILABLE', 1), ('A74', 'AVAILABLE', 1), ('A75', 'AVAILABLE', 1), ('A76', 'AVAILABLE', 1), ('A77', 'AVAILABLE', 1), ('A78', 'AVAILABLE', 1), ('A79', 'AVAILABLE', 1), ('A80', 'AVAILABLE', 1),
-  ('A81', 'AVAILABLE', 1), ('A82', 'AVAILABLE', 1), ('A83', 'AVAILABLE', 1), ('A84', 'AVAILABLE', 1), ('A85', 'AVAILABLE', 1), ('A86', 'AVAILABLE', 1), ('A87', 'AVAILABLE', 1), ('A88', 'AVAILABLE', 1), ('A89', 'AVAILABLE', 1), ('A90', 'AVAILABLE', 1),
-  ('A91', 'AVAILABLE', 1), ('A92', 'AVAILABLE', 1), ('A93', 'AVAILABLE', 1), ('A94', 'AVAILABLE', 1), ('A95', 'AVAILABLE', 1), ('A96', 'AVAILABLE', 1), ('A97', 'AVAILABLE', 1), ('A98', 'AVAILABLE', 1), ('A99', 'AVAILABLE', 1), ('A100', 'AVAILABLE', 1),
-  ('B1', 'AVAILABLE', 2), ('B2', 'AVAILABLE', 2), ('B3', 'AVAILABLE', 2), ('B4', 'AVAILABLE', 2), ('B5', 'AVAILABLE', 2), ('B6', 'AVAILABLE', 2), ('B7', 'AVAILABLE', 2), ('B8', 'AVAILABLE', 2), ('B9', 'AVAILABLE', 2), ('B10', 'AVAILABLE', 2),
-  ('B11', 'AVAILABLE', 2), ('B12', 'AVAILABLE', 2), ('B13', 'AVAILABLE', 2), ('B14', 'AVAILABLE', 2), ('B15', 'AVAILABLE', 2), ('B16', 'AVAILABLE', 2), ('B17', 'AVAILABLE', 2), ('B18', 'AVAILABLE', 2), ('B19', 'AVAILABLE', 2), ('B20', 'AVAILABLE', 2),
-  ('B21', 'AVAILABLE', 2), ('B22', 'AVAILABLE', 2), ('B23', 'AVAILABLE', 2), ('B24', 'AVAILABLE', 2), ('B25', 'AVAILABLE', 2), ('B26', 'AVAILABLE', 2), ('B27', 'AVAILABLE', 2), ('B28', 'AVAILABLE', 2), ('B29', 'AVAILABLE', 2), ('B30', 'AVAILABLE', 2),
-  ('B31', 'AVAILABLE', 2), ('B32', 'AVAILABLE', 2), ('B33', 'AVAILABLE', 2), ('B34', 'AVAILABLE', 2), ('B35', 'AVAILABLE', 2), ('B36', 'AVAILABLE', 2), ('B37', 'AVAILABLE', 2), ('B38', 'AVAILABLE', 2), ('B39', 'AVAILABLE', 2), ('B40', 'AVAILABLE', 2),
-  ('B41', 'AVAILABLE', 2), ('B42', 'AVAILABLE', 2), ('B43', 'AVAILABLE', 2), ('B44', 'AVAILABLE', 2), ('B45', 'AVAILABLE', 2), ('B46', 'AVAILABLE', 2), ('B47', 'AVAILABLE', 2), ('B48', 'AVAILABLE', 2), ('B49', 'AVAILABLE', 2), ('B50', 'AVAILABLE', 2),
-  ('B51', 'AVAILABLE', 2), ('B52', 'AVAILABLE', 2), ('B53', 'AVAILABLE', 2), ('B54', 'AVAILABLE', 2), ('B55', 'AVAILABLE', 2), ('B56', 'AVAILABLE', 2), ('B57', 'AVAILABLE', 2), ('B58', 'AVAILABLE', 2), ('B59', 'AVAILABLE', 2), ('B60', 'AVAILABLE', 2),
-  ('B61', 'AVAILABLE', 2), ('B62', 'AVAILABLE', 2), ('B63', 'AVAILABLE', 2), ('B64', 'AVAILABLE', 2), ('B65', 'AVAILABLE', 2), ('B66', 'AVAILABLE', 2), ('B67', 'AVAILABLE', 2), ('B68', 'AVAILABLE', 2), ('B69', 'AVAILABLE', 2), ('B70', 'AVAILABLE', 2),
-  ('B71', 'AVAILABLE', 2), ('B72', 'AVAILABLE', 2), ('B73', 'AVAILABLE', 2), ('B74', 'AVAILABLE', 2), ('B75', 'AVAILABLE', 2), ('B76', 'AVAILABLE', 2), ('B77', 'AVAILABLE', 2), ('B78', 'AVAILABLE', 2), ('B79', 'AVAILABLE', 2), ('B80', 'AVAILABLE', 2),
-  ('B81', 'AVAILABLE', 2), ('B82', 'AVAILABLE', 2), ('B83', 'AVAILABLE', 2), ('B84', 'AVAILABLE', 2), ('B85', 'AVAILABLE', 2), ('B86', 'AVAILABLE', 2), ('B87', 'AVAILABLE', 2), ('B88', 'AVAILABLE', 2), ('B89', 'AVAILABLE', 2), ('B90', 'AVAILABLE', 2),
-  ('B91', 'AVAILABLE', 2), ('B92', 'AVAILABLE', 2), ('B93', 'AVAILABLE', 2), ('B94', 'AVAILABLE', 2), ('B95', 'AVAILABLE', 2), ('B96', 'AVAILABLE', 2), ('B97', 'AVAILABLE', 2), ('B98', 'AVAILABLE', 2), ('B99', 'AVAILABLE', 2), ('B100', 'AVAILABLE', 2),
-  ('C1', 'AVAILABLE', 3), ('C2', 'AVAILABLE', 3), ('C3', 'AVAILABLE', 3), ('C4', 'AVAILABLE', 3), ('C5', 'AVAILABLE', 3), ('C6', 'AVAILABLE', 3), ('C7', 'AVAILABLE', 3), ('C8', 'AVAILABLE', 3), ('C9', 'AVAILABLE', 3), ('C10', 'AVAILABLE', 3),
-  ('C11', 'AVAILABLE', 3), ('C12', 'AVAILABLE', 3), ('C13', 'AVAILABLE', 3), ('C14', 'AVAILABLE', 3), ('C15', 'AVAILABLE', 3), ('C16', 'AVAILABLE', 3), ('C17', 'AVAILABLE', 3), ('C18', 'AVAILABLE', 3), ('C19', 'AVAILABLE', 3), ('C20', 'AVAILABLE', 3),
-  ('C21', 'AVAILABLE', 3), ('C22', 'AVAILABLE', 3), ('C23', 'AVAILABLE', 3), ('C24', 'AVAILABLE', 3), ('C25', 'AVAILABLE', 3), ('C26', 'AVAILABLE', 3), ('C27', 'AVAILABLE', 3), ('C28', 'AVAILABLE', 3), ('C29', 'AVAILABLE', 3), ('C30', 'AVAILABLE', 3),
-  ('C31', 'AVAILABLE', 3), ('C32', 'AVAILABLE', 3), ('C33', 'AVAILABLE', 3), ('C34', 'AVAILABLE', 3), ('C35', 'AVAILABLE', 3), ('C36', 'AVAILABLE', 3), ('C37', 'AVAILABLE', 3), ('C38', 'AVAILABLE', 3), ('C39', 'AVAILABLE', 3), ('C40', 'AVAILABLE', 3),
-  ('C41', 'AVAILABLE', 3), ('C42', 'AVAILABLE', 3), ('C43', 'AVAILABLE', 3), ('C44', 'AVAILABLE', 3), ('C45', 'AVAILABLE', 3), ('C46', 'AVAILABLE', 3), ('C47', 'AVAILABLE', 3), ('C48', 'AVAILABLE', 3), ('C49', 'AVAILABLE', 3), ('C50', 'AVAILABLE', 3),
-  ('C51', 'AVAILABLE', 3), ('C52', 'AVAILABLE', 3), ('C53', 'AVAILABLE', 3), ('C54', 'AVAILABLE', 3), ('C55', 'AVAILABLE', 3), ('C56', 'AVAILABLE', 3), ('C57', 'AVAILABLE', 3), ('C58', 'AVAILABLE', 3), ('C59', 'AVAILABLE', 3), ('C60', 'AVAILABLE', 3),
-  ('C61', 'AVAILABLE', 3), ('C62', 'AVAILABLE', 3), ('C63', 'AVAILABLE', 3), ('C64', 'AVAILABLE', 3), ('C65', 'AVAILABLE', 3), ('C66', 'AVAILABLE', 3), ('C67', 'AVAILABLE', 3), ('C68', 'AVAILABLE', 3), ('C69', 'AVAILABLE', 3), ('C70', 'AVAILABLE', 3),
-  ('C71', 'AVAILABLE', 3), ('C72', 'AVAILABLE', 3), ('C73', 'AVAILABLE', 3), ('C74', 'AVAILABLE', 3), ('C75', 'AVAILABLE', 3), ('C76', 'AVAILABLE', 3), ('C77', 'AVAILABLE', 3), ('C78', 'AVAILABLE', 3), ('C79', 'AVAILABLE', 3), ('C80', 'AVAILABLE', 3),
-  ('C81', 'AVAILABLE', 3), ('C82', 'AVAILABLE', 3), ('C83', 'AVAILABLE', 3), ('C84', 'AVAILABLE', 3), ('C85', 'AVAILABLE', 3), ('C86', 'AVAILABLE', 3), ('C87', 'AVAILABLE', 3), ('C88', 'AVAILABLE', 3), ('C89', 'AVAILABLE', 3), ('C90', 'AVAILABLE', 3),
-  ('C91', 'AVAILABLE', 3), ('C92', 'AVAILABLE', 3), ('C93', 'AVAILABLE', 3), ('C94', 'AVAILABLE', 3), ('C95', 'AVAILABLE', 3), ('C96', 'AVAILABLE', 3), ('C97', 'AVAILABLE', 3), ('C98', 'AVAILABLE', 3), ('C99', 'AVAILABLE', 3), ('C100', 'AVAILABLE', 3),
-  ('D1', 'AVAILABLE', 4), ('D2', 'AVAILABLE', 4), ('D3', 'AVAILABLE', 4), ('D4', 'AVAILABLE', 4), ('D5', 'AVAILABLE', 4), ('D6', 'AVAILABLE', 4), ('D7', 'AVAILABLE', 4), ('D8', 'AVAILABLE', 4), ('D9', 'AVAILABLE', 4), ('D10', 'AVAILABLE', 4),
-  ('D11', 'AVAILABLE', 4), ('D12', 'AVAILABLE', 4), ('D13', 'AVAILABLE', 4), ('D14', 'AVAILABLE', 4), ('D15', 'AVAILABLE', 4), ('D16', 'AVAILABLE', 4), ('D17', 'AVAILABLE', 4), ('D18', 'AVAILABLE', 4), ('D19', 'AVAILABLE', 4), ('D20', 'AVAILABLE', 4),
-  ('D21', 'AVAILABLE', 4), ('D22', 'AVAILABLE', 4), ('D23', 'AVAILABLE', 4), ('D24', 'AVAILABLE', 4), ('D25', 'AVAILABLE', 4), ('D26', 'AVAILABLE', 4), ('D27', 'AVAILABLE', 4), ('D28', 'AVAILABLE', 4), ('D29', 'AVAILABLE', 4), ('D30', 'AVAILABLE', 4),
-  ('D31', 'AVAILABLE', 4), ('D32', 'AVAILABLE', 4), ('D33', 'AVAILABLE', 4), ('D34', 'AVAILABLE', 4), ('D35', 'AVAILABLE', 4), ('D36', 'AVAILABLE', 4), ('D37', 'AVAILABLE', 4), ('D38', 'AVAILABLE', 4), ('D39', 'AVAILABLE', 4), ('D40', 'AVAILABLE', 4),
-  ('D41', 'AVAILABLE', 4), ('D42', 'AVAILABLE', 4), ('D43', 'AVAILABLE', 4), ('D44', 'AVAILABLE', 4), ('D45', 'AVAILABLE', 4), ('D46', 'AVAILABLE', 4), ('D47', 'AVAILABLE', 4), ('D48', 'AVAILABLE', 4), ('D49', 'AVAILABLE', 4), ('D50', 'AVAILABLE', 4),
-  ('D51', 'AVAILABLE', 4), ('D52', 'AVAILABLE', 4), ('D53', 'AVAILABLE', 4), ('D54', 'AVAILABLE', 4), ('D55', 'AVAILABLE', 4), ('D56', 'AVAILABLE', 4), ('D57', 'AVAILABLE', 4), ('D58', 'AVAILABLE', 4), ('D59', 'AVAILABLE', 4), ('D60', 'AVAILABLE', 4),
-  ('D61', 'AVAILABLE', 4), ('D62', 'AVAILABLE', 4), ('D63', 'AVAILABLE', 4), ('D64', 'AVAILABLE', 4), ('D65', 'AVAILABLE', 4), ('D66', 'AVAILABLE', 4), ('D67', 'AVAILABLE', 4), ('D68', 'AVAILABLE', 4), ('D69', 'AVAILABLE', 4), ('D70', 'AVAILABLE', 4),
-  ('D71', 'AVAILABLE', 4), ('D72', 'AVAILABLE', 4), ('D73', 'AVAILABLE', 4), ('D74', 'AVAILABLE', 4), ('D75', 'AVAILABLE', 4), ('D76', 'AVAILABLE', 4), ('D77', 'AVAILABLE', 4), ('D78', 'AVAILABLE', 4), ('D79', 'AVAILABLE', 4), ('D80', 'AVAILABLE', 4),
-  ('D81', 'AVAILABLE', 4), ('D82', 'AVAILABLE', 4), ('D83', 'AVAILABLE', 4), ('D84', 'AVAILABLE', 4), ('D85', 'AVAILABLE', 4), ('D86', 'AVAILABLE', 4), ('D87', 'AVAILABLE', 4), ('D88', 'AVAILABLE', 4), ('D89', 'AVAILABLE', 4), ('D90', 'AVAILABLE', 4),
-  ('D91', 'AVAILABLE', 4), ('D92', 'AVAILABLE', 4), ('D93', 'AVAILABLE', 4), ('D94', 'AVAILABLE', 4), ('D95', 'AVAILABLE', 4), ('D96', 'AVAILABLE', 4), ('D97', 'AVAILABLE', 4), ('D98', 'AVAILABLE', 4), ('D99', 'AVAILABLE', 4), ('D100', 'AVAILABLE', 4);
+
+-- =========================================================
+-- FLOOR 1 : A1 - A100
+-- =========================================================
+
+('A1', 'AVAILABLE', 1), ('A2', 'AVAILABLE', 1), ('A3', 'AVAILABLE', 1),
+('A4', 'AVAILABLE', 1), ('A5', 'AVAILABLE', 1), ('A6', 'AVAILABLE', 1),
+('A7', 'AVAILABLE', 1), ('A8', 'AVAILABLE', 1), ('A9', 'AVAILABLE', 1),
+('A10', 'AVAILABLE', 1),
+
+('A11', 'AVAILABLE', 1), ('A12', 'AVAILABLE', 1), ('A13', 'AVAILABLE', 1),
+('A14', 'AVAILABLE', 1), ('A15', 'AVAILABLE', 1), ('A16', 'AVAILABLE', 1),
+('A17', 'AVAILABLE', 1), ('A18', 'AVAILABLE', 1), ('A19', 'AVAILABLE', 1),
+('A20', 'AVAILABLE', 1),
+
+('A21', 'AVAILABLE', 1), ('A22', 'AVAILABLE', 1), ('A23', 'AVAILABLE', 1),
+('A24', 'AVAILABLE', 1), ('A25', 'AVAILABLE', 1), ('A26', 'AVAILABLE', 1),
+('A27', 'AVAILABLE', 1), ('A28', 'AVAILABLE', 1), ('A29', 'AVAILABLE', 1),
+('A30', 'AVAILABLE', 1),
+
+('A31', 'AVAILABLE', 1), ('A32', 'AVAILABLE', 1), ('A33', 'AVAILABLE', 1),
+('A34', 'AVAILABLE', 1), ('A35', 'AVAILABLE', 1), ('A36', 'AVAILABLE', 1),
+('A37', 'AVAILABLE', 1), ('A38', 'AVAILABLE', 1), ('A39', 'AVAILABLE', 1),
+('A40', 'AVAILABLE', 1),
+
+('A41', 'AVAILABLE', 1), ('A42', 'AVAILABLE', 1), ('A43', 'AVAILABLE', 1),
+('A44', 'AVAILABLE', 1), ('A45', 'AVAILABLE', 1), ('A46', 'AVAILABLE', 1),
+('A47', 'AVAILABLE', 1), ('A48', 'AVAILABLE', 1), ('A49', 'AVAILABLE', 1),
+('A50', 'AVAILABLE', 1),
+
+('A51', 'AVAILABLE', 1), ('A52', 'AVAILABLE', 1), ('A53', 'AVAILABLE', 1),
+('A54', 'AVAILABLE', 1), ('A55', 'AVAILABLE', 1), ('A56', 'AVAILABLE', 1),
+('A57', 'AVAILABLE', 1), ('A58', 'AVAILABLE', 1), ('A59', 'AVAILABLE', 1),
+('A60', 'AVAILABLE', 1),
+
+('A61', 'AVAILABLE', 1), ('A62', 'AVAILABLE', 1), ('A63', 'AVAILABLE', 1),
+('A64', 'AVAILABLE', 1), ('A65', 'AVAILABLE', 1), ('A66', 'AVAILABLE', 1),
+('A67', 'AVAILABLE', 1), ('A68', 'AVAILABLE', 1), ('A69', 'AVAILABLE', 1),
+('A70', 'AVAILABLE', 1),
+
+('A71', 'AVAILABLE', 1), ('A72', 'AVAILABLE', 1), ('A73', 'AVAILABLE', 1),
+('A74', 'AVAILABLE', 1), ('A75', 'AVAILABLE', 1), ('A76', 'AVAILABLE', 1),
+('A77', 'AVAILABLE', 1), ('A78', 'AVAILABLE', 1), ('A79', 'AVAILABLE', 1),
+('A80', 'AVAILABLE', 1),
+
+('A81', 'AVAILABLE', 1), ('A82', 'AVAILABLE', 1), ('A83', 'AVAILABLE', 1),
+('A84', 'AVAILABLE', 1), ('A85', 'AVAILABLE', 1), ('A86', 'AVAILABLE', 1),
+('A87', 'AVAILABLE', 1), ('A88', 'AVAILABLE', 1), ('A89', 'AVAILABLE', 1),
+('A90', 'AVAILABLE', 1),
+
+('A91', 'AVAILABLE', 1), ('A92', 'AVAILABLE', 1), ('A93', 'AVAILABLE', 1),
+('A94', 'AVAILABLE', 1), ('A95', 'AVAILABLE', 1), ('A96', 'AVAILABLE', 1),
+('A97', 'AVAILABLE', 1), ('A98', 'AVAILABLE', 1), ('A99', 'AVAILABLE', 1),
+('A100', 'AVAILABLE', 1),
+
+
+-- =========================================================
+-- FLOOR 2 : B1 - B100
+-- =========================================================
+
+('B1', 'AVAILABLE', 2), ('B2', 'AVAILABLE', 2), ('B3', 'AVAILABLE', 2),
+('B4', 'AVAILABLE', 2), ('B5', 'AVAILABLE', 2), ('B6', 'AVAILABLE', 2),
+('B7', 'AVAILABLE', 2), ('B8', 'AVAILABLE', 2), ('B9', 'AVAILABLE', 2),
+('B10', 'AVAILABLE', 2),
+
+('B11', 'AVAILABLE', 2), ('B12', 'AVAILABLE', 2), ('B13', 'AVAILABLE', 2),
+('B14', 'AVAILABLE', 2), ('B15', 'AVAILABLE', 2), ('B16', 'AVAILABLE', 2),
+('B17', 'AVAILABLE', 2), ('B18', 'AVAILABLE', 2), ('B19', 'AVAILABLE', 2),
+('B20', 'AVAILABLE', 2),
+
+('B21', 'AVAILABLE', 2), ('B22', 'AVAILABLE', 2), ('B23', 'AVAILABLE', 2),
+('B24', 'AVAILABLE', 2), ('B25', 'AVAILABLE', 2), ('B26', 'AVAILABLE', 2),
+('B27', 'AVAILABLE', 2), ('B28', 'AVAILABLE', 2), ('B29', 'AVAILABLE', 2),
+('B30', 'AVAILABLE', 2),
+
+('B31', 'AVAILABLE', 2), ('B32', 'AVAILABLE', 2), ('B33', 'AVAILABLE', 2),
+('B34', 'AVAILABLE', 2), ('B35', 'AVAILABLE', 2), ('B36', 'AVAILABLE', 2),
+('B37', 'AVAILABLE', 2), ('B38', 'AVAILABLE', 2), ('B39', 'AVAILABLE', 2),
+('B40', 'AVAILABLE', 2),
+
+('B41', 'AVAILABLE', 2), ('B42', 'AVAILABLE', 2), ('B43', 'AVAILABLE', 2),
+('B44', 'AVAILABLE', 2), ('B45', 'AVAILABLE', 2), ('B46', 'AVAILABLE', 2),
+('B47', 'AVAILABLE', 2), ('B48', 'AVAILABLE', 2), ('B49', 'AVAILABLE', 2),
+('B50', 'AVAILABLE', 2),
+
+('B51', 'AVAILABLE', 2), ('B52', 'AVAILABLE', 2), ('B53', 'AVAILABLE', 2),
+('B54', 'AVAILABLE', 2), ('B55', 'AVAILABLE', 2), ('B56', 'AVAILABLE', 2),
+('B57', 'AVAILABLE', 2), ('B58', 'AVAILABLE', 2), ('B59', 'AVAILABLE', 2),
+('B60', 'AVAILABLE', 2),
+
+('B61', 'AVAILABLE', 2), ('B62', 'AVAILABLE', 2), ('B63', 'AVAILABLE', 2),
+('B64', 'AVAILABLE', 2), ('B65', 'AVAILABLE', 2), ('B66', 'AVAILABLE', 2),
+('B67', 'AVAILABLE', 2), ('B68', 'AVAILABLE', 2), ('B69', 'AVAILABLE', 2),
+('B70', 'AVAILABLE', 2),
+
+('B71', 'AVAILABLE', 2), ('B72', 'AVAILABLE', 2), ('B73', 'AVAILABLE', 2),
+('B74', 'AVAILABLE', 2), ('B75', 'AVAILABLE', 2), ('B76', 'AVAILABLE', 2),
+('B77', 'AVAILABLE', 2), ('B78', 'AVAILABLE', 2), ('B79', 'AVAILABLE', 2),
+('B80', 'AVAILABLE', 2),
+
+('B81', 'AVAILABLE', 2), ('B82', 'AVAILABLE', 2), ('B83', 'AVAILABLE', 2),
+('B84', 'AVAILABLE', 2), ('B85', 'AVAILABLE', 2), ('B86', 'AVAILABLE', 2),
+('B87', 'AVAILABLE', 2), ('B88', 'AVAILABLE', 2), ('B89', 'AVAILABLE', 2),
+('B90', 'AVAILABLE', 2),
+
+('B91', 'AVAILABLE', 2), ('B92', 'AVAILABLE', 2), ('B93', 'AVAILABLE', 2),
+('B94', 'AVAILABLE', 2), ('B95', 'AVAILABLE', 2), ('B96', 'AVAILABLE', 2),
+('B97', 'AVAILABLE', 2), ('B98', 'AVAILABLE', 2), ('B99', 'AVAILABLE', 2),
+('B100', 'AVAILABLE', 2),
+
+
+-- =========================================================
+-- FLOOR 3 : C1 - C100
+-- =========================================================
+
+('C1', 'AVAILABLE', 3), ('C2', 'AVAILABLE', 3), ('C3', 'AVAILABLE', 3),
+('C4', 'AVAILABLE', 3), ('C5', 'AVAILABLE', 3), ('C6', 'AVAILABLE', 3),
+('C7', 'AVAILABLE', 3), ('C8', 'AVAILABLE', 3), ('C9', 'AVAILABLE', 3),
+('C10', 'AVAILABLE', 3),
+
+('C11', 'AVAILABLE', 3), ('C12', 'AVAILABLE', 3), ('C13', 'AVAILABLE', 3),
+('C14', 'AVAILABLE', 3), ('C15', 'AVAILABLE', 3), ('C16', 'AVAILABLE', 3),
+('C17', 'AVAILABLE', 3), ('C18', 'AVAILABLE', 3), ('C19', 'AVAILABLE', 3),
+('C20', 'AVAILABLE', 3),
+
+('C21', 'AVAILABLE', 3), ('C22', 'AVAILABLE', 3), ('C23', 'AVAILABLE', 3),
+('C24', 'AVAILABLE', 3), ('C25', 'AVAILABLE', 3), ('C26', 'AVAILABLE', 3),
+('C27', 'AVAILABLE', 3), ('C28', 'AVAILABLE', 3), ('C29', 'AVAILABLE', 3),
+('C30', 'AVAILABLE', 3),
+
+('C31', 'AVAILABLE', 3), ('C32', 'AVAILABLE', 3), ('C33', 'AVAILABLE', 3),
+('C34', 'AVAILABLE', 3), ('C35', 'AVAILABLE', 3), ('C36', 'AVAILABLE', 3),
+('C37', 'AVAILABLE', 3), ('C38', 'AVAILABLE', 3), ('C39', 'AVAILABLE', 3),
+('C40', 'AVAILABLE', 3),
+
+('C41', 'AVAILABLE', 3), ('C42', 'AVAILABLE', 3), ('C43', 'AVAILABLE', 3),
+('C44', 'AVAILABLE', 3), ('C45', 'AVAILABLE', 3), ('C46', 'AVAILABLE', 3),
+('C47', 'AVAILABLE', 3), ('C48', 'AVAILABLE', 3), ('C49', 'AVAILABLE', 3),
+('C50', 'AVAILABLE', 3),
+
+('C51', 'AVAILABLE', 3), ('C52', 'AVAILABLE', 3), ('C53', 'AVAILABLE', 3),
+('C54', 'AVAILABLE', 3), ('C55', 'AVAILABLE', 3), ('C56', 'AVAILABLE', 3),
+('C57', 'AVAILABLE', 3), ('C58', 'AVAILABLE', 3), ('C59', 'AVAILABLE', 3),
+('C60', 'AVAILABLE', 3),
+
+('C61', 'AVAILABLE', 3), ('C62', 'AVAILABLE', 3), ('C63', 'AVAILABLE', 3),
+('C64', 'AVAILABLE', 3), ('C65', 'AVAILABLE', 3), ('C66', 'AVAILABLE', 3),
+('C67', 'AVAILABLE', 3), ('C68', 'AVAILABLE', 3), ('C69', 'AVAILABLE', 3),
+('C70', 'AVAILABLE', 3),
+
+('C71', 'AVAILABLE', 3), ('C72', 'AVAILABLE', 3), ('C73', 'AVAILABLE', 3),
+('C74', 'AVAILABLE', 3), ('C75', 'AVAILABLE', 3), ('C76', 'AVAILABLE', 3),
+('C77', 'AVAILABLE', 3), ('C78', 'AVAILABLE', 3), ('C79', 'AVAILABLE', 3),
+('C80', 'AVAILABLE', 3),
+
+('C81', 'AVAILABLE', 3), ('C82', 'AVAILABLE', 3), ('C83', 'AVAILABLE', 3),
+('C84', 'AVAILABLE', 3), ('C85', 'AVAILABLE', 3), ('C86', 'AVAILABLE', 3),
+('C87', 'AVAILABLE', 3), ('C88', 'AVAILABLE', 3), ('C89', 'AVAILABLE', 3),
+('C90', 'AVAILABLE', 3),
+
+('C91', 'AVAILABLE', 3), ('C92', 'AVAILABLE', 3), ('C93', 'AVAILABLE', 3),
+('C94', 'AVAILABLE', 3), ('C95', 'AVAILABLE', 3), ('C96', 'AVAILABLE', 3),
+('C97', 'AVAILABLE', 3), ('C98', 'AVAILABLE', 3), ('C99', 'AVAILABLE', 3),
+('C100', 'AVAILABLE', 3),
+
+
+-- =========================================================
+-- FLOOR 4 : D1 - D100
+-- =========================================================
+
+('D1', 'AVAILABLE', 4), ('D2', 'AVAILABLE', 4), ('D3', 'AVAILABLE', 4),
+('D4', 'AVAILABLE', 4), ('D5', 'AVAILABLE', 4), ('D6', 'AVAILABLE', 4),
+('D7', 'AVAILABLE', 4), ('D8', 'AVAILABLE', 4), ('D9', 'AVAILABLE', 4),
+('D10', 'AVAILABLE', 4),
+
+('D11', 'AVAILABLE', 4), ('D12', 'AVAILABLE', 4), ('D13', 'AVAILABLE', 4),
+('D14', 'AVAILABLE', 4), ('D15', 'AVAILABLE', 4), ('D16', 'AVAILABLE', 4),
+('D17', 'AVAILABLE', 4), ('D18', 'AVAILABLE', 4), ('D19', 'AVAILABLE', 4),
+('D20', 'AVAILABLE', 4),
+
+('D21', 'AVAILABLE', 4), ('D22', 'AVAILABLE', 4), ('D23', 'AVAILABLE', 4),
+('D24', 'AVAILABLE', 4), ('D25', 'AVAILABLE', 4), ('D26', 'AVAILABLE', 4),
+('D27', 'AVAILABLE', 4), ('D28', 'AVAILABLE', 4), ('D29', 'AVAILABLE', 4),
+('D30', 'AVAILABLE', 4),
+
+('D31', 'AVAILABLE', 4), ('D32', 'AVAILABLE', 4), ('D33', 'AVAILABLE', 4),
+('D34', 'AVAILABLE', 4), ('D35', 'AVAILABLE', 4), ('D36', 'AVAILABLE', 4),
+('D37', 'AVAILABLE', 4), ('D38', 'AVAILABLE', 4), ('D39', 'AVAILABLE', 4),
+('D40', 'AVAILABLE', 4),
+
+('D41', 'AVAILABLE', 4), ('D42', 'AVAILABLE', 4), ('D43', 'AVAILABLE', 4),
+('D44', 'AVAILABLE', 4), ('D45', 'AVAILABLE', 4), ('D46', 'AVAILABLE', 4),
+('D47', 'AVAILABLE', 4), ('D48', 'AVAILABLE', 4), ('D49', 'AVAILABLE', 4),
+('D50', 'AVAILABLE', 4),
+
+('D51', 'AVAILABLE', 4), ('D52', 'AVAILABLE', 4), ('D53', 'AVAILABLE', 4),
+('D54', 'AVAILABLE', 4), ('D55', 'AVAILABLE', 4), ('D56', 'AVAILABLE', 4),
+('D57', 'AVAILABLE', 4), ('D58', 'AVAILABLE', 4), ('D59', 'AVAILABLE', 4),
+('D60', 'AVAILABLE', 4),
+
+('D61', 'AVAILABLE', 4), ('D62', 'AVAILABLE', 4), ('D63', 'AVAILABLE', 4),
+('D64', 'AVAILABLE', 4), ('D65', 'AVAILABLE', 4), ('D66', 'AVAILABLE', 4),
+('D67', 'AVAILABLE', 4), ('D68', 'AVAILABLE', 4), ('D69', 'AVAILABLE', 4),
+('D70', 'AVAILABLE', 4),
+
+('D71', 'AVAILABLE', 4), ('D72', 'AVAILABLE', 4), ('D73', 'AVAILABLE', 4),
+('D74', 'AVAILABLE', 4), ('D75', 'AVAILABLE', 4), ('D76', 'AVAILABLE', 4),
+('D77', 'AVAILABLE', 4), ('D78', 'AVAILABLE', 4), ('D79', 'AVAILABLE', 4),
+('D80', 'AVAILABLE', 4),
+
+('D81', 'AVAILABLE', 4), ('D82', 'AVAILABLE', 4), ('D83', 'AVAILABLE', 4),
+('D84', 'AVAILABLE', 4), ('D85', 'AVAILABLE', 4), ('D86', 'AVAILABLE', 4),
+('D87', 'AVAILABLE', 4), ('D88', 'AVAILABLE', 4), ('D89', 'AVAILABLE', 4),
+('D90', 'AVAILABLE', 4),
+
+('D91', 'AVAILABLE', 4), ('D92', 'AVAILABLE', 4), ('D93', 'AVAILABLE', 4),
+('D94', 'AVAILABLE', 4), ('D95', 'AVAILABLE', 4), ('D96', 'AVAILABLE', 4),
+('D97', 'AVAILABLE', 4), ('D98', 'AVAILABLE', 4), ('D99', 'AVAILABLE', 4),
+('D100', 'AVAILABLE', 4)
+
+ON CONFLICT DO NOTHING;

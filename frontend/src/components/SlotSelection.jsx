@@ -6,7 +6,7 @@ import { getSlots, holdSlot, releaseSlot, HOLD_MINUTES } from "../api/api";
 import HoldCountdown from "./HoldCountdown";
 import "./SlotSelection.css";
 
-const REFRESH_MS = 6000; // how often to re-poll slot status from the backend
+const REFRESH_MS = 3000; // how often to re-poll slot status from the backend
 
 // ---- layout config ----------------------------------------------------
 

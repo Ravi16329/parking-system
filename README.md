@@ -5,9 +5,7 @@ A web application that lets residents/visitors of an apartment building **book a
 > This project is a scaled-down, apartment-specific version of a generic city-wide parking system. It focuses on **one apartment with a fixed number of dummy parking slots**, not multi-location search.
 
 ---
-// addedd cI/CD 
 
-// checking in lab ci/cd
 ## 📌 Project Overview
 
 | | |
@@ -40,7 +38,7 @@ A web application that lets residents/visitors of an apartment building **book a
    → "Book Parking" button
 
 2. SLOT SELECTION PAGE
-   → Shows all dummy slots in a grid (e.g. A1–A20)
+   → Shows all dummy slots in a grid 
    → Color coding:
         🟩 Green  = Available
         🟨 Yellow = Held (someone else is currently booking it)

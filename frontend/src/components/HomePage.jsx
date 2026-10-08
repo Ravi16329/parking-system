@@ -35,15 +35,33 @@ export default function HomePage() {
   const videoRefs = useRef([]);
 
   // Load apartment details + a live "free slots" count for the stat row.
+  // Load apartment + announcements once.
+  // Poll slot count every 3 seconds so "Free now" stays live.
   useEffect(() => {
     getApartment().then(setApartment);
-    getSlots().then((slots) => {
-      setFreeSlots(slots.filter((s) => s.status === "available").length);
-    });
-    // Newest-first from the backend, so the first one is the latest notice.
+
     getAnnouncements()
       .then((list) => setAnnouncement(list[0] || null))
       .catch(() => { });
+
+    const refreshFreeSlots = () => {
+      getSlots()
+        .then((slots) => {
+          setFreeSlots(
+            slots.filter((s) => s.status === "available").length
+          );
+        })
+        .catch(() => { });
+    };
+
+    // Fetch immediately when HomePage opens
+    refreshFreeSlots();
+
+    // Then refresh every 3 seconds
+    const interval = setInterval(refreshFreeSlots, 3000);
+
+    // Stop polling when leaving HomePage
+    return () => clearInterval(interval);
   }, []);
 
   // This hero is a full-viewport, no-scroll layout — lock body scroll
