@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { payForBooking, releaseSlot } from "../api/api";
+import { createPaymentOrder, verifyPayment, releaseSlot } from "../api/api";
 import HoldCountdown from "./HoldCountdown";
 import "./PaymentPage.css";
 
@@ -88,24 +88,88 @@ export default function PaymentPage({
 
   async function handlePay() {
     if (processing || cancelling) return;
+
     setProcessing(true);
     setPayError("");
-    try {
-      // Simulated delay so the "processing" state is visible in the demo.
-      await new Promise((resolve) => setTimeout(resolve, 1100));
 
-      // Dummy gateway for now — PaymentServiceImpl on the backend always
-      // "succeeds" and confirms the booking. When Razorpay is wired in,
-      // this is where checkout.js opens instead, and payForBooking() gets
-      // called with the razorpay_payment_id/order_id/signature it returns
-      // instead of just { bookingId, method }.
-      const result = await payForBooking({ bookingId: booking.bookingId, method });
-      setBooking({ ...booking, ...result });
-      setHoldExpiresAt?.(null); // paid — the slot is OCCUPIED now, not HELD
-      navigate("/confirmation");
-    } catch (err) {
-      setPayError("Payment failed — please try again.");
-    } finally {
+    try {
+      // 1. Create Razorpay order from backend
+      const order = await createPaymentOrder(booking.bookingId);
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay Checkout failed to load");
+      }
+
+      // 2. Razorpay Checkout configuration
+      const options = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Smart Parking",
+        description: `Parking Slot ${booking.slotId}`,
+        order_id: order.orderId,
+
+        prefill: {
+          name: booking.name,
+          contact: booking.phone,
+        },
+
+        theme: {
+          color: "#111827",
+        },
+
+        handler: async function (response) {
+          try {
+            // 3. Send Razorpay response to backend
+            const result = await verifyPayment({
+              bookingId: booking.bookingId,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+
+            // 4. Payment verified successfully
+            setBooking({ ...booking, ...result });
+            setHoldExpiresAt?.(null);
+
+            navigate("/confirmation");
+          } catch (error) {
+            console.error("Payment verification error:", error);
+            setPayError("Payment verification failed. Please contact support.");
+          } finally {
+            setProcessing(false);
+          }
+        },
+
+        modal: {
+          ondismiss: function () {
+            setProcessing(false);
+            setPayError("Payment cancelled.");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", function (response) {
+        console.error("Razorpay payment failed:", response.error);
+
+        setPayError(
+          response.error?.description || "Payment failed. Please try again."
+        );
+
+        setProcessing(false);
+      });
+
+      // 5. Open Razorpay Checkout
+      razorpay.open();
+    } catch (error) {
+      console.error("Payment error:", error);
+
+      setPayError(
+        error.message || "Unable to start payment. Please try again."
+      );
+
       setProcessing(false);
     }
   }
@@ -218,7 +282,7 @@ export default function PaymentPage({
           </button>
 
           <p className="secure-note">
-            <LockIcon /> Payments are simulated in this build — no real transaction occurs.
+            <LockIcon /> Secure payment powered by Razorpay Test Mode.
           </p>
         </div>
       </div>

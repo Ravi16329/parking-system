@@ -253,3 +253,47 @@ export async function adminDeleteAnnouncement(id, token) {
   if (res.status === 401) throw new Error("UNAUTHORIZED");
   return res.ok;
 }
+
+
+export async function createPaymentOrder(bookingId) {
+  const res = await fetch(`${BASE_URL}/payments/order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ bookingId }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create payment order");
+  }
+
+  return await res.json();
+}
+
+
+export async function verifyPayment({
+  bookingId,
+  razorpayPaymentId,
+  razorpayOrderId,
+  razorpaySignature,
+}) {
+  const res = await fetch(`${BASE_URL}/payments/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      bookingId,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Payment verification failed");
+  }
+
+  return normalizeBooking(await asJson(res));
+}
