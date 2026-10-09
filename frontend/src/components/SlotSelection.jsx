@@ -568,9 +568,18 @@ export default function SlotSelection({
 
     const floorSlots = allSlots.filter((s) => s.floor === currentFloor);
 
-    floorSlots.forEach((slot, i) => {
-      const col = i % GRID_COLS;
-      const row = Math.floor(i / GRID_COLS);
+    floorSlots.forEach((slot) => {
+      // Derive the grid cell from the slot's own number (e.g. "A37" -> 37),
+      // NOT from its position in this array. GET /api/slots has no ORDER BY,
+      // so the backend doesn't guarantee the same row order on every poll —
+      // positioning by array index meant every bay could jump to a
+      // different cell whenever the order happened to shift (e.g. right
+      // after an UPDATE, like holding a slot). Keying off the slot's own
+      // id makes each bay's position fixed regardless of fetch order.
+      const num = parseInt(String(slot.id).replace(/^[A-Za-z]+/, ""), 10);
+      const idx = Number.isFinite(num) ? num - 1 : 0; // 0-based within its floor
+      const col = idx % GRID_COLS;
+      const row = Math.floor(idx / GRID_COLS);
 
       const mesh = new THREE.Mesh(
         bayGeoRef.current,
