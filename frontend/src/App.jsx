@@ -8,7 +8,7 @@ import ConfirmationPage from "./components/ConfirmationPage";
 import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import QrScanner from "./components/QrScanner";
-import QrScanner from "./components/QrScanner";
+
 /**
  * Booking flow:
  *   Home -> Select Slot -> Booking Form -> Payment -> Confirmation
