@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunksmart_parking_apartment_frontend||=[]).push([[100],{100(a){a.exports=JSON.parse('{"name":"PVP Square ","address":"Bcent road , Vijayawada","totalSlots":20,"image":"apartment.jpg"}')}}]);
