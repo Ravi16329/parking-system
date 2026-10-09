@@ -21,6 +21,7 @@ import com.smartparking.apartment.entity.Payment;
 import com.smartparking.apartment.repository.BookingRepository;
 import com.smartparking.apartment.repository.PaymentRepository;
 import com.smartparking.apartment.service.PaymentService;
+import com.smartparking.apartment.service.QrService;
 import com.smartparking.apartment.service.SlotService;
 
 @Service
@@ -37,6 +38,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private RazorpayClient razorpayClient;
+
+    @Autowired
+private QrService qrService;
 
     @Value("${razorpay.key.id}")
     private String razorpayKeyId;
@@ -174,15 +178,20 @@ public Booking verifyPayment(PaymentVerifyRequest request) {
     paymentRepository.save(payment);
 
     // 7. Confirm booking
-    booking.setStatus(Booking.Status.CONFIRMED);
-    bookingRepository.save(booking);
+booking.setStatus(Booking.Status.CONFIRMED);
+bookingRepository.save(booking);
 
-    // 8. Occupy slot
-    slotService.markOccupied(
-            booking.getSlotId()
-    );
+// 8. Occupy slot
+slotService.markOccupied(
+        booking.getSlotId()
+);
 
-    return booking;
+// 9. Generate QR after successful payment
+qrService.generateQr(
+        booking.getBookingId()
+);
+
+return booking;
 }
 
     @Override

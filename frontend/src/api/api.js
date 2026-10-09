@@ -297,3 +297,18 @@ export async function verifyPayment({
 
   return normalizeBooking(await asJson(res));
 }
+
+
+export async function getQrByBooking(bookingId) {
+  const res = await fetch(`${BASE_URL}/qr/booking/${bookingId}`);
+
+  if (res.status === 404) {
+    return null;
+  }
+
+  if (!res.ok) {
+    throw new Error("Failed to get parking QR");
+  }
+
+  return await res.json();
+}
