@@ -187,6 +187,14 @@ export default function AdminDashboard() {
         <button className="btn btn-secondary" onClick={handleLogout}>
           Log Out
         </button>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/check-qr")}
+        >
+          Check QR
+        </button>
+
       </div>
 
       {error && <div className="admin-error">{error}</div>}

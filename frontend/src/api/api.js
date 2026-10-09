@@ -312,3 +312,32 @@ export async function getQrByBooking(bookingId) {
 
   return await res.json();
 }
+
+export async function adminVerifyQr(token, adminToken) {
+  const res = await fetch(
+    `${BASE_URL}/qr/verify?token=${encodeURIComponent(token)}`,
+    {
+      method: "POST",
+      headers: {
+        "X-Admin-Token": adminToken || "",
+      },
+    }
+  );
+
+  const data = await asJson(res).catch(() => null);
+
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!res.ok) {
+    throw new Error(
+      data?.message ||
+      (res.status === 404
+        ? "Invalid QR code"
+        : "QR code has already been used or cannot be verified")
+    );
+  }
+
+  return data;
+}

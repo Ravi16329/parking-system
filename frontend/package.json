@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://ravi16329.github.io/parking-system/",
   "dependencies": {
+    "html5-qrcode": "^2.3.8",
     "jspdf": "^4.2.1",
     "qrcode.react": "^3.1.0",
     "react": "^18.3.1",
