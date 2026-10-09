@@ -27,68 +27,106 @@ public class QrController {
     @Autowired
     private AdminAuthService adminAuthService;
 
-    // Generate QR for confirmed booking
+    // Generate QR for a confirmed booking
     @PostMapping("/generate/{bookingId}")
-    public ResponseEntity<QrResponse> generateQr(
+    public ResponseEntity<?> generateQr(
             @PathVariable String bookingId) {
+        try {
+            return ResponseEntity.ok(qrService.generateQr(bookingId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // Get QR for the customer confirmation page
+    @GetMapping("/booking/{bookingId}")
+    public ResponseEntity<?> getQrByBooking(
+            @PathVariable String bookingId) {
+        try {
+            return ResponseEntity.ok(qrService.getQrByBooking(bookingId));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // Entry Check: ACTIVE -> PARKED
+    @PostMapping("/entry")
+    public ResponseEntity<?> verifyEntry(
+            @RequestParam String token,
+            @RequestHeader(value = "X-Admin-Token", required = false)
+            String adminToken) {
+
+        if (!adminAuthService.isValid(adminToken)) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "Admin login required"));
+        }
 
         try {
-
-            return ResponseEntity.ok(
-                    qrService.generateQr(bookingId)
-            );
+            QrResponse response = qrService.verifyEntry(token);
+            return ResponseEntity.ok(response);
 
         } catch (NoSuchElementException e) {
-
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404)
+                    .body(Map.of("message", "Invalid QR code"));
 
         } catch (IllegalStateException e) {
-
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
-    // Get QR for confirmation page
-    @GetMapping("/booking/{bookingId}")
-    public ResponseEntity<QrResponse> getQrByBooking(
-            @PathVariable String bookingId) {
+    // Exit Check: PARKED -> USED and release the occupied slot
+    @PostMapping("/exit")
+    public ResponseEntity<?> verifyExit(
+            @RequestParam String token,
+            @RequestHeader(value = "X-Admin-Token", required = false)
+            String adminToken) {
+
+        if (!adminAuthService.isValid(adminToken)) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "Admin login required"));
+        }
 
         try {
-
-            return ResponseEntity.ok(
-                    qrService.getQrByBooking(bookingId)
-            );
+            QrResponse response = qrService.verifyExit(token);
+            return ResponseEntity.ok(response);
 
         } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404)
+                    .body(Map.of("message", "Invalid QR code or booking"));
 
-            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
-    // Verify one-time QR
- @PostMapping("/verify")
-public ResponseEntity<?> verifyQr(
-        @RequestParam String token,
-        @RequestHeader(
-            value = "X-Admin-Token",
-            required = false
-        ) String adminToken) {
+    // Keep the old endpoint temporarily for compatibility.
+    // It now performs an entry check.
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyQr(
+            @RequestParam String token,
+            @RequestHeader(value = "X-Admin-Token", required = false)
+            String adminToken) {
 
-    if (!adminAuthService.isValid(adminToken)) {
-        return ResponseEntity.status(401)
-                .body(Map.of("message", "Admin login required"));
+        if (!adminAuthService.isValid(adminToken)) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("message", "Admin login required"));
+        }
+
+        try {
+            return ResponseEntity.ok(qrService.verifyEntry(token));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404)
+                    .body(Map.of("message", "Invalid QR code"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
-
-    try {
-        return ResponseEntity.ok(qrService.verifyQr(token));
-
-    } catch (NoSuchElementException e) {
-        return ResponseEntity.status(404)
-                .body(Map.of("message", "Invalid QR code"));
-
-    } catch (IllegalStateException e) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("message", e.getMessage()));
-    }
-}
 }

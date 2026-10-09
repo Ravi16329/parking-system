@@ -9,4 +9,8 @@ public interface QrService {
     QrResponse getQrByBooking(String bookingId);
 
     QrResponse verifyQr(String token);
+
+    QrResponse verifyEntry(String token);
+
+    QrResponse verifyExit(String token);
 }

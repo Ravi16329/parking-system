@@ -341,3 +341,43 @@ export async function adminVerifyQr(token, adminToken) {
 
   return data;
 }
+
+
+async function adminVerifyEntryQr(token, adminToken) {
+  return adminVerifyQrAction("entry", token, adminToken);
+}
+
+async function adminVerifyExitQr(token, adminToken) {
+  return adminVerifyQrAction("exit", token, adminToken);
+}
+
+async function adminVerifyQrAction(action, token, adminToken) {
+  const res = await fetch(
+    `${BASE_URL}/qr/${action}?token=${encodeURIComponent(token)}`,
+    {
+      method: "POST",
+      headers: {
+        "X-Admin-Token": adminToken || "",
+      },
+    }
+  );
+
+  const data = await asJson(res).catch(() => null);
+
+  if (res.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!res.ok) {
+    throw new Error(
+      data?.message ||
+      (res.status === 404
+        ? "Invalid QR code"
+        : `QR ${action} check failed`)
+    );
+  }
+
+  return data;
+}
+
+export { adminVerifyEntryQr, adminVerifyExitQr };

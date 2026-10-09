@@ -8,6 +8,7 @@ import ConfirmationPage from "./components/ConfirmationPage";
 import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import QrScanner from "./components/QrScanner";
+import QrScanner from "./components/QrScanner";
 /**
  * Booking flow:
  *   Home -> Select Slot -> Booking Form -> Payment -> Confirmation
@@ -72,7 +73,12 @@ export default function App() {
 
         <Route
           path="/admin/check-qr"
-          element={<QrScanner />}
+          element={<QrScanner mode="entry" />}
+        />
+
+        <Route
+          path="/admin/exit-check-qr"
+          element={<QrScanner mode="exit" />}
         />
 
       </Routes>

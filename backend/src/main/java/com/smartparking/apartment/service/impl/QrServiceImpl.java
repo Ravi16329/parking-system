@@ -13,6 +13,7 @@ import com.smartparking.apartment.entity.ParkingQr;
 import com.smartparking.apartment.repository.BookingRepository;
 import com.smartparking.apartment.repository.ParkingQrRepository;
 import com.smartparking.apartment.service.QrService;
+import com.smartparking.apartment.service.SlotService;
 
 @Service
 public class QrServiceImpl implements QrService {
@@ -23,86 +24,122 @@ private ParkingQrRepository parkingQrRepository;
 @Autowired
 private BookingRepository bookingRepository;
 
+@Autowired
+private SlotService slotService;
+
 @Override
 @Transactional
 public QrResponse generateQr(String bookingId) {
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "Booking not found: " + bookingId));
+    Booking booking = bookingRepository.findById(bookingId)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Booking not found: " + bookingId));
 
-        // QR can only be generated after successful payment
-        if (booking.getStatus() != Booking.Status.CONFIRMED) {
-            throw new IllegalStateException(
-                    "QR can only be generated for a confirmed booking");
-        }
-
-        // Do not generate another QR for the same booking
-        ParkingQr existing =
-                parkingQrRepository.findByBookingId(bookingId)
-                        .orElse(null);
-
-        if (existing != null) {
-
-            return new QrResponse(
-                    existing.getQrId(),
-                    existing.getToken(),
-                    existing.getBookingId(),
-                    existing.getStatus().name()
-            );
-        }
-
-        ParkingQr qr = new ParkingQr(bookingId);
-
-        parkingQrRepository.save(qr);
-
-        return new QrResponse(
-                qr.getQrId(),
-                qr.getToken(),
-                qr.getBookingId(),
-                qr.getStatus().name()
-        );
+    if (booking.getStatus() != Booking.Status.CONFIRMED) {
+        throw new IllegalStateException(
+                "QR can only be generated for a confirmed booking");
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public QrResponse getQrByBooking(String bookingId) {
+    ParkingQr existing = parkingQrRepository.findByBookingId(bookingId)
+            .orElse(null);
 
-        ParkingQr qr = parkingQrRepository
-                .findByBookingId(bookingId)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "QR not found for booking: " + bookingId));
-
-        return new QrResponse(
-                qr.getQrId(),
-                qr.getToken(),
-                qr.getBookingId(),
-                qr.getStatus().name()
-        );
+    if (existing != null) {
+        return toResponse(existing);
     }
 
+    ParkingQr qr = new ParkingQr(bookingId);
+    parkingQrRepository.save(qr);
+
+    return toResponse(qr);
+}
+
+@Override
+@Transactional(readOnly = true)
+public QrResponse getQrByBooking(String bookingId) {
+
+    ParkingQr qr = parkingQrRepository.findByBookingId(bookingId)
+            .orElseThrow(() ->
+                    new NoSuchElementException(
+                            "QR not found for booking: " + bookingId));
+
+    return toResponse(qr);
+}
 
 @Override
 @Transactional
-public QrResponse verifyQr(String token) {
+public QrResponse verifyEntry(String token) {
 
-    ParkingQr qr = parkingQrRepository
-            .findByTokenForUpdate(token)
+    ParkingQr qr = parkingQrRepository.findByTokenForUpdate(token)
             .orElseThrow(() ->
                     new NoSuchElementException("Invalid QR code"));
 
     if (qr.getStatus() != ParkingQr.Status.ACTIVE) {
         throw new IllegalStateException(
-                "QR code has already been used or expired");
+                "Entry denied. QR must be ACTIVE. Current status: "
+                        + qr.getStatus());
     }
 
+    Booking booking = bookingRepository.findById(qr.getBookingId())
+            .orElseThrow(() ->
+                    new NoSuchElementException("Booking not found"));
+
+    if (booking.getStatus() != Booking.Status.CONFIRMED) {
+        throw new IllegalStateException(
+                "Entry denied. Booking is not confirmed");
+    }
+
+    qr.setStatus(ParkingQr.Status.PARKED);
+    qr.setEntryAt(LocalDateTime.now());
+
+    parkingQrRepository.save(qr);
+
+    return toResponse(qr);
+}
+
+@Override
+@Transactional
+public QrResponse verifyExit(String token) {
+
+    ParkingQr qr = parkingQrRepository.findByTokenForUpdate(token)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Invalid QR code"));
+
+    if (qr.getStatus() != ParkingQr.Status.PARKED) {
+        throw new IllegalStateException(
+                "Exit denied. The vehicle must enter first. Current status: "
+                        + qr.getStatus());
+    }
+
+    Booking booking = bookingRepository.findById(qr.getBookingId())
+            .orElseThrow(() ->
+                    new NoSuchElementException("Booking not found"));
+
+    if (booking.getStatus() != Booking.Status.CONFIRMED) {
+        throw new IllegalStateException(
+                "Exit denied. Booking is not confirmed");
+    }
+
+    // Release the exact slot associated with this booking.
+    slotService.releaseOccupiedSlot(booking.getSlotId());
+
     qr.setStatus(ParkingQr.Status.USED);
+    qr.setExitAt(LocalDateTime.now());
     qr.setUsedAt(LocalDateTime.now());
 
     parkingQrRepository.save(qr);
 
+    return toResponse(qr);
+}
+
+// Kept for compatibility with code that still calls verifyQr().
+// Update the controller to use verifyEntry() or verifyExit().
+@Override
+@Transactional
+public QrResponse verifyQr(String token) {
+    return verifyEntry(token);
+}
+
+private QrResponse toResponse(ParkingQr qr) {
     return new QrResponse(
             qr.getQrId(),
             qr.getToken(),

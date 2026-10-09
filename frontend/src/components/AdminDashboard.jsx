@@ -188,11 +188,12 @@ export default function AdminDashboard() {
           Log Out
         </button>
 
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate("/admin/check-qr")}
-        >
-          Check QR
+        <button onClick={() => navigate("/admin/check-qr")}>
+          Entry Check
+        </button>
+
+        <button onClick={() => navigate("/admin/exit-check-qr")}>
+          Exit Check
         </button>
 
       </div>

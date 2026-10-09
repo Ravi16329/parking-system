@@ -16,6 +16,7 @@ public class ParkingQr {
 
     public enum Status {
         ACTIVE,
+        PARKED,
         USED,
         EXPIRED
     }
@@ -28,7 +29,6 @@ public class ParkingQr {
 
     @Column(nullable = false, unique = true)
     private String bookingId;
-    
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,6 +37,10 @@ public class ParkingQr {
     private LocalDateTime generatedAt;
 
     private LocalDateTime usedAt;
+
+    private LocalDateTime entryAt;
+
+    private LocalDateTime exitAt;
 
     public ParkingQr() {
     }
@@ -95,5 +99,21 @@ public class ParkingQr {
 
     public void setUsedAt(LocalDateTime usedAt) {
         this.usedAt = usedAt;
+    }
+
+    public LocalDateTime getEntryAt() {
+        return entryAt;
+    }
+
+    public void setEntryAt(LocalDateTime entryAt) {
+        this.entryAt = entryAt;
+    }
+
+    public LocalDateTime getExitAt() {
+        return exitAt;
+    }
+
+    public void setExitAt(LocalDateTime exitAt) {
+        this.exitAt = exitAt;
     }
 }

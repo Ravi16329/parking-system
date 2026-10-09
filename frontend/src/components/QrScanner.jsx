@@ -1,10 +1,12 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Html5Qrcode } from "html5-qrcode";
-import { adminVerifyQr } from "../api/api";
+import {
+    adminVerifyEntryQr,
+    adminVerifyExitQr,
+} from "../api/api";
 
-export default function QrScanner() {
+export default function QrScanner({ mode = "entry" }) {
     const navigate = useNavigate();
     const scannerRef = useRef(null);
     const busyRef = useRef(false);
@@ -15,6 +17,8 @@ export default function QrScanner() {
     const [checking, setChecking] = useState(false);
 
     const adminToken = sessionStorage.getItem("adminToken");
+    const isExit = mode === "exit";
+    const title = isExit ? "Exit Check" : "Entry Check";
 
     useEffect(() => {
         if (!adminToken) navigate("/admin");
@@ -38,11 +42,17 @@ export default function QrScanner() {
         setResult("");
 
         try {
-            const data = await adminVerifyQr(token, adminToken);
+            const verify = isExit
+                ? adminVerifyExitQr
+                : adminVerifyEntryQr;
+
+            const data = await verify(token, adminToken);
+
             setResult(
-                `ACCESS GRANTED — QR status: ${data.status}`
+                isExit
+                    ? `EXIT SUCCESSFUL — Slot released. QR status: ${data.status}`
+                    : `ENTRY APPROVED — QR status: ${data.status}`
             );
-            setScanning(false);
         } catch (err) {
             if (err.message === "UNAUTHORIZED") {
                 sessionStorage.removeItem("adminToken");
@@ -53,10 +63,13 @@ export default function QrScanner() {
         } finally {
             busyRef.current = false;
             setChecking(false);
+            setScanning(false);
         }
     }
 
     async function startCamera() {
+        if (scanning || checking) return;
+
         setError("");
         setResult("");
 
@@ -68,6 +81,8 @@ export default function QrScanner() {
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 async (decodedText) => {
+                    if (busyRef.current) return;
+
                     await scanner.stop().catch(() => { });
                     setScanning(false);
                     await checkToken(decodedText);
@@ -87,7 +102,7 @@ export default function QrScanner() {
         const file = event.target.files?.[0];
         event.target.value = "";
 
-        if (!file) return;
+        if (!file || checking) return;
 
         setError("");
         setResult("");
@@ -110,12 +125,23 @@ export default function QrScanner() {
                 Back to Dashboard
             </button>
 
-            <h1>Check Parking QR</h1>
-            <p>Scan a customer's parking QR or upload its image.</p>
+            <h1>{title}</h1>
 
-            <div id="qr-reader" style={{ width: "100%", margin: "20px 0" }} />
+            <p>
+                {isExit
+                    ? "Scan the QR code of a vehicle that has already entered. Its occupied slot will be released."
+                    : "Scan the QR code of a confirmed booking to approve vehicle entry."}
+            </p>
 
-            <button onClick={startCamera} disabled={scanning || checking}>
+            <div
+                id="qr-reader"
+                style={{ width: "100%", margin: "20px 0" }}
+            />
+
+            <button
+                onClick={startCamera}
+                disabled={scanning || checking}
+            >
                 {scanning ? "Camera Active" : "Open Camera"}
             </button>
 
@@ -125,10 +151,10 @@ export default function QrScanner() {
                 type="file"
                 accept="image/*"
                 onChange={uploadImage}
-                disabled={checking}
+                disabled={checking || scanning}
             />
 
-            {checking && <p>Verifying QR…</p>}
+            {checking && <p>Checking QR code...</p>}
 
             {result && (
                 <p style={{ color: "green", fontWeight: "bold" }}>

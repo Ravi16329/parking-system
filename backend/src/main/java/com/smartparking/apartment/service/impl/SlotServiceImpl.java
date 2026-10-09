@@ -109,4 +109,22 @@ public Booking adminBookSlot(String slotId, String name, String phone) {
     booking.setCreatedAt(LocalDateTime.now());
     return bookingRepository.save(booking);
 }
+
+@Override
+@Transactional
+public void releaseOccupiedSlot(String slotId) {
+    Slot slot = slotRepository.findById(slotId)
+            .orElseThrow(() ->
+                    new NoSuchElementException("No such slot: " + slotId));
+
+    if (slot.getStatus() != Slot.Status.OCCUPIED) {
+        throw new IllegalStateException(
+                "Cannot release slot because it is not occupied: " + slotId);
+    }
+
+    slot.setStatus(Slot.Status.AVAILABLE);
+    slot.setHeldAt(null);
+    slotRepository.save(slot);
+}
+
 }
