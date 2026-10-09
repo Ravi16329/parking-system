@@ -369,11 +369,15 @@ async function adminVerifyQrAction(action, token, adminToken) {
   }
 
   if (!res.ok) {
+    console.error("QR API error:", {
+      action,
+      status: res.status,
+      response: data,
+    });
+
     throw new Error(
       data?.message ||
-      (res.status === 404
-        ? "Invalid QR code"
-        : `QR ${action} check failed`)
+      `QR ${action} check failed (HTTP ${res.status})`
     );
   }
 
