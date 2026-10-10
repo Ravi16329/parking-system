@@ -173,7 +173,7 @@ erDiagram
     PARKING_QR {
         string qrId PK "UUID"
         string token UK "the value actually encoded in the QR image"
-        string bookingId UK FK
+        string bookingId UK, FK
         string status "ACTIVE | PARKED | USED | EXPIRED"
         datetime generatedAt
         datetime entryAt
