@@ -27,6 +27,7 @@ An admin panel lets staff book walk-in visitors, free up stuck bays, and post no
 [✨ Features](#-features) •
 [🧰 Tech Stack](#-1-tech-stack) •
 [🏗️ Architecture](#️-2-high-level-architecture) •
+[🧱 Architectural Style](#-21-architectural-style-at-a-glance) •
 [🗄️ Database](#️-4-database-schema) •
 [🔄 Core Flows](#-6-core-flows) •
 [⚠️ Limitations](#️-7-known-gaps--honest-limitations) •
@@ -100,6 +101,114 @@ graph TD
 
 > [!IMPORTANT]
 > The frontend never talks to Razorpay's secret key directly — it only opens the Razorpay widget with an **order id** the backend created, then hands the resulting payment id/signature back to the backend, which is the only place that verifies them (see [§6.1](#61-online-booking-payment-and-qr-issuance)).
+
+### 🧱 2.1 Architectural style at a glance
+
+| Aspect | What was built |
+|---|---|
+| **Overall style** | **Client-Server**, with a RESTful API as the contract between the two sides |
+| **Backend internal structure** | **Layered (N-tier) architecture** — Controller (presentation) → Service (business logic) → Repository (data access) → PostgreSQL (data layer) |
+| **Deployment shape** | **Monolith** — one Spring Boot app, one deployable unit (not microservices) |
+| **Frontend** | **Single Page Application (SPA)** — client-side routing (`HashRouter`), all views rendered in the browser |
+| **"Live" updates** | **Client-side polling** (every 3 seconds), not server push |
+| **Background work** | **Scheduled task** (`@Scheduled`), not event-driven |
+
+```mermaid
+flowchart TB
+    subgraph Client["🖥️ Client tier — React SPA (GitHub Pages)"]
+        UI["components/*"] --> API["api/api.js<br/>the only file that calls fetch()"]
+    end
+
+    subgraph Server["⚙️ Server tier — Spring Boot monolith (Render)"]
+        CT["Controller<br/>presentation layer"] --> SV["Service + impl<br/>business logic"]
+        SV --> RP["Repository<br/>data access layer"]
+        SW["SlotHoldSweeper<br/>@Scheduled every 20s"] --> RP
+    end
+
+    DB[("🗄️ PostgreSQL<br/>data layer")]
+
+    API -- "HTTP / REST (JSON)" --> CT
+    RP -- "Spring Data JPA" --> DB
+```
+
+> [!IMPORTANT]
+> **Suggested wording for an SRS / report:**
+> *"The system uses a two-tier client-server architecture: a React single-page application (client) communicates with a Spring Boot REST API (server) over HTTP. The server is the sole owner of application state and business rules, persisted in PostgreSQL, and supports multiple concurrent clients. Internally, the server follows a layered architecture (Controller → Service → Repository). Background slot-expiry cleanup is handled via a scheduled polling job rather than event-driven messaging."*
+
+### 🤝 2.2 Why this is a Client-Server architecture
+
+Client-server has a specific definition: **two separate, independently running programs** — a *client* that requests things and a *server* that provides them — talking over a network through a **defined interface**, where the **server owns the data and the logic** and the client only gets access through it. This project matches that point for point:
+
+**1️⃣ Two genuinely separate programs, each with its own lifecycle**
+
+The React app and the Spring Boot app aren't just two folders — they are two independent deployables, built separately, deployed separately, and running on separate hosts:
+
+| | Frontend (client) | Backend (server) |
+|---|---|---|
+| **Build** | `npm run build` | `mvn package` |
+| **Packaging** | Static files | Docker container (`Dockerfile`) |
+| **Host** | GitHub Pages | Render |
+
+Neither depends on the other being built with it. You could redeploy the backend ten times without ever touching the frontend, and vice versa — that independence is the first hallmark of client-server.
+
+**2️⃣ They only talk through a defined interface — the REST API**
+
+The client never reaches into the server's internals. Every single interaction goes through `api.js`, which calls HTTP endpoints like `POST /api/slots/{id}/hold` or `POST /api/payments/verify`. The frontend has zero knowledge of `SlotServiceImpl`, the JPA repositories, or the database — it only knows *"if I POST here with this JSON, I get that JSON back."* That API is the contract between client and server — the second hallmark.
+
+**3️⃣ The server owns the data and the rules — the client can't bypass it**
+
+The PostgreSQL database lives only on the backend. The browser can't query or write to it directly — it can only ask the server to act on its behalf. Critically, the **server enforces the rules**: `slotRepository.tryHold(...)` is an atomic conditional update, so if two browsers click the same bay at the same instant, only one wins. The client has no way to force that outcome, because it has neither the logic nor the database. That centralization of authority is exactly what client-server means.
+
+**4️⃣ Request-response, not push — the client always initiates**
+
+Every exchange starts with the client asking: `SlotSelection.jsx` polls `GET /api/slots` every 3 seconds; `PaymentPage.jsx` calls `POST /api/payments/verify` after Razorpay returns. The server never contacts the browser on its own — it only replies to requests it received.
+
+**5️⃣ One server, many clients**
+
+The backend isn't written for a single user — it assumes many browsers connect to the same server at once. That is exactly why:
+
+- `tryHold` needs to be **atomic**
+- `SlotHoldSweeper` exists as a **shared background job**
+- admin tokens are tracked **centrally** in `AdminAuthService` rather than per browser
+
+None of that machinery would be necessary if client and server were really one program — it exists specifically because many clients share one server's state.
+
+### 🚫 2.3 Why this is *not* an Event-Driven Architecture (EDA)
+
+> [!WARNING]
+> Worth getting this right before presenting — a reviewer in a software-architecture course will very likely probe this claim.
+
+**EDA** means components communicate by producing and consuming events through an event bus or message broker (Kafka, RabbitMQ, Spring's `ApplicationEventPublisher`, WebSockets/SSE, etc.). Producers don't know who is listening, and consumers react asynchronously whenever an event arrives. **Nothing in this system works that way:**
+
+| Part of the system | How it actually works | Why that's not EDA |
+|---|---|---|
+| **Frontend → backend** | Synchronous REST over HTTP (`fetch()` calls in `api.js`) | Direct request/response, not a published event |
+| **`SlotSelection.jsx` live updates** | Polls `GET /api/slots` every 3 seconds (`setInterval`) | Polling means the client keeps asking; event-driven means the server pushes when something happens — they are opposites |
+| **`SlotHoldSweeper`** | `@Scheduled(fixedRate = 20_000)` timer job | It isn't triggered by a hold expiring; it wakes up every 20s and checks |
+| **Razorpay integration** | Direct REST calls (create order, verify signature) | The system doesn't listen for a Razorpay webhook event either |
+| **Messaging infrastructure** | None | No message broker, no internal event bus, no pub/sub, no WebSocket/SSE anywhere in the codebase |
+
+### 🔮 2.4 Future enhancement — a genuinely event-driven piece
+
+If a real event-driven component is wanted (as a "future enhancement" section, or to add before presenting), the natural candidate is **replacing the 3-second slot-status poll with WebSockets or Server-Sent Events (SSE)**:
+
+```mermaid
+sequenceDiagram
+    participant B1 as Browser A
+    participant B2 as Browser B
+    participant BE as Spring Boot API
+
+    B1->>BE: subscribe to slot events (WebSocket / SSE)
+    B2->>BE: subscribe to slot events (WebSocket / SSE)
+    B1->>BE: POST /api/slots/A5/hold
+    BE-->>B1: slot A5 is HELD (response)
+    BE--)B2: push event "slot A5 → HELD"
+    Note over BE,B2: Hold expires (sweeper / lazy release)
+    BE--)B1: push event "slot A5 → AVAILABLE"
+    BE--)B2: push event "slot A5 → AVAILABLE"
+```
+
+The backend would push *"slot X is now HELD / AVAILABLE"* to every connected client the moment it happens, instead of every browser asking every 3 seconds. That would be real event-driven behavior, reduce needless traffic, and make the garage view update instantly.
 
 ---
 
