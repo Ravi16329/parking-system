@@ -132,16 +132,61 @@ export async function verifyOtp(phone, code) {
 // Bookings + payment — both persisted on the real backend now, so a booking
 // survives a refresh and shows up in getBookingHistory() for its phone number.
 // ---------------------------------------------------------------------------
-export async function createBooking({ slotId, name, phone, durationHours = 1 }) {
-  const res = await fetch(`${BASE_URL}/bookings`, {
+
+export async function createBooking({
+  slotId,
+  name,
+  phone,
+  scheduledStartAt,
+  scheduledEndAt,
+}) {
+  const payload = {
+    slotId,
+    name,
+    phone,
+    scheduledStartAt,
+    scheduledEndAt,
+  };
+
+  console.log("Creating booking with payload:", payload);
+
+  const response = await fetch(`${BASE_URL}/bookings`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ slotId, name, phone, durationHours }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
-  const data = await asJson(res).catch(() => null);
-  if (!res.ok) throw new Error(data?.message || `Could not create booking (HTTP ${res.status})`);
+
+  const responseText = await response.text();
+
+  let data = null;
+
+  try {
+    data = responseText ? JSON.parse(responseText) : null;
+  } catch {
+    data = { message: responseText };
+  }
+
+  if (!response.ok) {
+    console.error("Booking API error:", {
+      status: response.status,
+      response: data,
+      payload,
+    });
+
+    throw new Error(
+      data?.message ||
+      data?.error ||
+      data?.detail ||
+      (typeof data === "string" ? data : null) ||
+      `Could not create booking (HTTP ${response.status})`
+    );
+  }
+
   return normalizeBooking(data);
 }
+
 
 export async function getBooking(bookingId) {
   const res = await fetch(`${BASE_URL}/bookings/${bookingId}`);
