@@ -618,41 +618,45 @@ export default function BookingForm({
 
                 {/* Start time */}
                 <div className="form-group">
-                  <label htmlFor="startTime">
-                    Parking start time
-                  </label>
+                  <label htmlFor="startTime">Parking start time</label>
 
-                  <input
+                  <select
                     id="startTime"
-                    type="time"
-                    step="3600"
                     required
                     value={startTime}
                     onChange={(event) => {
-                      const value = event.target.value;
-
-                      setStartTime(value);
+                      setStartTime(event.target.value);
                       setErrors((previous) => ({
                         ...previous,
                         duration: undefined,
                       }));
                       setBookingError("");
                     }}
-                  />
+                  >
+                    <option value="">Select start hour</option>
+                    {Array.from({ length: 24 }, (_, hour) => {
+                      const value = `${String(hour).padStart(2, "0")}:00`;
+                      const label = new Date(2000, 0, 1, hour).toLocaleTimeString(
+                        "en-IN",
+                        { hour: "2-digit", minute: "2-digit", hour12: true }
+                      );
+
+                      return (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
 
                 {/* End time */}
                 <div className="form-group">
-                  <label htmlFor="endTime">
-                    Parking end time
-                  </label>
+                  <label htmlFor="endTime">Parking end time</label>
 
-                  <input
+                  <select
                     id="endTime"
-                    type="time"
-                    step="3600"
                     required
-                    min={startTime || undefined}
                     value={endTime}
                     onChange={(event) => {
                       setEndTime(event.target.value);
@@ -662,27 +666,54 @@ export default function BookingForm({
                       }));
                       setBookingError("");
                     }}
-                  />
+                  >
+                    <option value="">Select end hour</option>
+                    {Array.from({ length: 24 }, (_, hour) => {
+                      const value = `${String(hour).padStart(2, "0")}:00`;
+                      const label = new Date(2000, 0, 1, hour).toLocaleTimeString(
+                        "en-IN",
+                        { hour: "2-digit", minute: "2-digit", hour12: true }
+                      );
+
+                      return (
+                        <option
+                          key={value}
+                          value={value}
+                          disabled={
+                            hour * 60 <= currentMinutes ||
+                            (startMinutes >= 0 && hour * 60 <= startMinutes)
+                          }
+                        >
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
 
                   {errors.duration && (
-                    <div className="error-text" role="alert">
-                      {errors.duration}
-                    </div>
+                    <div className="error-text">{errors.duration}</div>
                   )}
 
-                  {startTime && endTime && !validDuration && (
-                    <div className="error-text" role="alert">
-                      Select a start time that is not in the past
-                      and an end time later on the same day.
-                      Duration must be in whole hours.
+                  <div className="parking-price-summary">
+                    <div className="parking-price-row">
+                      <span>Parking duration</span>
+                      <strong>
+                        {durationHours} {durationHours === 1 ? "hour" : "hours"}
+                      </strong>
                     </div>
-                  )}
 
-                  <small>
-                    Duration: {durationHours} hour(s). Rate: ₹
-                    {HOURLY_RATE} per hour. Estimated price: ₹
-                    {estimatedPrice}. No daily cap.
-                  </small>
+                    <div className="parking-price-row">
+                      <span>Hourly rate</span>
+                      <strong>₹50/hour</strong>
+                    </div>
+
+                    <div className="parking-price-total">
+                      <span>Estimated total</span>
+                      <strong>₹{estimatedPrice}</strong>
+                    </div>
+
+                    <p>No daily cap — pay only for the hours selected.</p>
+                  </div>
                 </div>
 
                 {/* Full name */}
