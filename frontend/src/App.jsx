@@ -9,6 +9,8 @@ import AdminLogin from "./components/AdminLogin";
 import AdminDashboard from "./components/AdminDashboard";
 import QrScanner from "./components/QrScanner";
 
+import BookingHistory from "./components/BookingHistory";
+
 /**
  * Booking flow:
  *   Home -> Select Slot -> Booking Form -> Payment -> Confirmation
@@ -80,6 +82,9 @@ export default function App() {
           path="/admin/exit-check-qr"
           element={<QrScanner mode="exit" />}
         />
+
+        <Route path="/booking-history" element={<BookingHistory />} />
+
 
       </Routes>
     </HashRouter>
