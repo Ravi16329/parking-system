@@ -91,42 +91,155 @@ const otpCodes = new Map(); // phone -> { code, expiresAt }
 const OTP_TTL_MS = 2 * 60 * 1000;
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function sendOtp(phone) {
-  // Live version, once the frontend is wired to the backend:
-  // const res = await fetch(`${BASE_URL}/otp/send`, {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ phone }),
-  // });
-  // return res.json();
+// export async function sendOtp(phone) {
+//   // Live version, once the frontend is wired to the backend:
+//   // const res = await fetch(`${BASE_URL}/otp/send`, {
+//   //   method: "POST",
+//   //   headers: { "Content-Type": "application/json" },
+//   //   body: JSON.stringify({ phone }),
+//   // });
+//   // return res.json();
 
-  await delay(700);
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  otpCodes.set(phone, { code, expiresAt: Date.now() + OTP_TTL_MS });
-  console.info(`[demo] OTP for ${phone}: ${code}`);
-  return { success: true, phone, expiresInSec: OTP_TTL_MS / 1000, devCode: code };
+//   await delay(700);
+//   const code = String(Math.floor(100000 + Math.random() * 900000));
+//   otpCodes.set(phone, { code, expiresAt: Date.now() + OTP_TTL_MS });
+//   console.info(`[demo] OTP for ${phone}: ${code}`);
+//   return { success: true, phone, expiresInSec: OTP_TTL_MS / 1000, devCode: code };
+// }
+
+// export async function verifyOtp(phone, code) {
+//   // Live version:
+//   // const res = await fetch(`${BASE_URL}/otp/verify`, {
+//   //   method: "POST",
+//   //   headers: { "Content-Type": "application/json" },
+//   //   body: JSON.stringify({ phone, code }),
+//   // });
+//   // return res.json();
+
+//   await delay(600);
+//   const entry = otpCodes.get(phone);
+//   if (!entry || Date.now() > entry.expiresAt) {
+//     return { success: false, message: "That code has expired. Send a new one." };
+//   }
+//   if (entry.code !== code) {
+//     return { success: false, message: "Wrong code. Check the SMS and try again." };
+//   }
+//   otpCodes.delete(phone);
+//   return { success: true, phone };
+// }
+
+
+/* =========================================================
+   OTP — REAL BACKEND INTEGRATION
+   Message Central SMS OTP is handled by the Spring Boot backend.
+   ========================================================= */
+
+// OLD MOCK OTP IMPLEMENTATION — preserved for reference only.
+// Do not uncomment this while using real SMS OTP.
+//
+// const otpCodes = new Map();
+// const OTP_TTL_MS = 2 * 60 * 1000;
+// const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+//
+// Old sendOtp implementation generated a code in the browser.
+// Old verifyOtp implementation checked that browser-generated code.
+// This is no longer used because OTP must be verified by the backend.
+
+export async function sendOtp(phone) {
+  try {
+    const res = await fetch(`${BASE_URL}/otp/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phone: String(phone).trim(),
+      }),
+    });
+
+    const text = await res.text();
+    let data = {};
+
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = {};
+    }
+
+    if (!res.ok || data.success !== true) {
+      return {
+        success: false,
+        message:
+          data.message ||
+          "Unable to send OTP. Please try again.",
+      };
+    }
+
+    // Never expose or generate an OTP in the frontend.
+    return {
+      success: true,
+      phone: data.phone || String(phone).trim(),
+      expiresInSec: data.expiresInSec || 120,
+      message: data.message || "OTP sent successfully.",
+    };
+  } catch (error) {
+    console.error("Send OTP error:", error);
+
+    return {
+      success: false,
+      message:
+        "Unable to connect to the server. Please try again.",
+    };
+  }
 }
 
 export async function verifyOtp(phone, code) {
-  // Live version:
-  // const res = await fetch(`${BASE_URL}/otp/verify`, {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ phone, code }),
-  // });
-  // return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/otp/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phone: String(phone).trim(),
+        code: String(code).trim(),
+      }),
+    });
 
-  await delay(600);
-  const entry = otpCodes.get(phone);
-  if (!entry || Date.now() > entry.expiresAt) {
-    return { success: false, message: "That code has expired. Send a new one." };
+    const text = await res.text();
+    let data = {};
+
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = {};
+    }
+
+    if (!res.ok || data.success !== true) {
+      return {
+        success: false,
+        message:
+          data.message ||
+          "Wrong or expired OTP. Please try again.",
+      };
+    }
+
+    return {
+      success: true,
+      phone: data.phone || String(phone).trim(),
+      message: data.message || "OTP verified successfully.",
+    };
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+
+    return {
+      success: false,
+      message:
+        "Unable to verify OTP. Check your connection and try again.",
+    };
   }
-  if (entry.code !== code) {
-    return { success: false, message: "Wrong code. Check the SMS and try again." };
-  }
-  otpCodes.delete(phone);
-  return { success: true, phone };
 }
+
 
 // ---------------------------------------------------------------------------
 // Bookings + payment — both persisted on the real backend now, so a booking
