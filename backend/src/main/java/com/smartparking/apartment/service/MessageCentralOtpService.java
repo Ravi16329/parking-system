@@ -41,7 +41,11 @@ public class MessageCentralOtpService {
     @Value("${messagecentral.email:}")
     private String email;
 
-    private record Verification(String id, Instant expiresAt) {}
+    private record Verification(
+        String id,
+        Instant expiresAt,
+        String authToken
+) {}
 
     private final Map<String, Verification> verifications =
             new ConcurrentHashMap<>();
@@ -131,7 +135,10 @@ public class MessageCentralOtpService {
 
             // Keep the provider's verification ID on the backend.
             verifications.put(phone, new Verification(
-                    verificationId, Instant.now().plusSeconds(120)));
+        verificationId,
+        Instant.now().plusSeconds(120),
+        token
+));
 
         } catch (RestClientResponseException e) {
             throw new IllegalStateException(
@@ -155,7 +162,7 @@ public boolean verifyOtp(String phone, String code) {
         return false;
     }
 
-    String token = generateToken();
+    String token = verification.authToken();
 
     String url = UriComponentsBuilder
             .fromHttpUrl(BASE_URL + "/verification/v3/validateOtp/")
