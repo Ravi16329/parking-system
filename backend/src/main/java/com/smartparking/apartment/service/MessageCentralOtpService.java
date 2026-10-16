@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +24,10 @@ public class MessageCentralOtpService {
 
     private static final String BASE_URL =
             "https://cpaas.messagecentral.com";
+
+
+            private static final Logger log =
+        LoggerFactory.getLogger(MessageCentralOtpService.class);
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -138,51 +144,86 @@ public class MessageCentralOtpService {
         }
     }
 
-    public boolean verifyOtp(String phone, String code) {
-        Verification verification = verifications.get(phone);
+    
+public boolean verifyOtp(String phone, String code) {
+    Verification verification = verifications.get(phone);
 
-        if (verification == null
-                || Instant.now().isAfter(verification.expiresAt())) {
-            verifications.remove(phone);
-            return false;
-        }
-
-        String token = generateToken();
-
-        String url = UriComponentsBuilder
-                .fromHttpUrl(BASE_URL + "/verification/v3/validateOtp/")
-                .queryParam("verificationId", verification.id())
-                .queryParam("code", code)
-                .queryParam("flowType", "SMS")
-                .build()
-                .encode()
-                .toUriString();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("authToken", token);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    url, HttpMethod.GET, new HttpEntity<>(headers),
-                    String.class);
-
-            JsonNode json = objectMapper.readTree(response.getBody());
-            String status = json.path("data")
-                    .path("verificationStatus").asText("");
-
-            if ("VERIFICATION_COMPLETED".equals(status)) {
-                verifications.remove(phone);
-                return true;
-            }
-
-            return false;
-
-        } catch (RestClientResponseException e) {
-            // A rejected/incorrect OTP should not be treated as verified.
-            return false;
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Could not verify the OTP with Message Central.");
-        }
+    if (verification == null
+            || Instant.now().isAfter(verification.expiresAt())) {
+        verifications.remove(phone);
+        log.warn("OTP verification unavailable: no active verification session.");
+        return false;
     }
+
+    String token = generateToken();
+
+    String url = UriComponentsBuilder
+            .fromHttpUrl(BASE_URL + "/verification/v3/validateOtp/")
+            .queryParam("verificationId", verification.id())
+            .queryParam("code", code)
+            .queryParam("flowType", "SMS")
+            .build()
+            .encode()
+            .toUriString();
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("authToken", token);
+
+    try {
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                String.class
+        );
+
+        JsonNode json = objectMapper.readTree(response.getBody());
+
+        String responseCode = json.path("responseCode").asText("");
+        String message = json.path("message").asText("");
+        String status = json.path("data")
+                .path("verificationStatus").asText("");
+
+        // Safe diagnostics only: never log the OTP or authentication token.
+        log.info(
+                "Message Central OTP verification response: HTTP {}, responseCode={}, status={}, message={}",
+                response.getStatusCode().value(),
+                responseCode,
+                status,
+                message
+        );
+
+        if ("VERIFICATION_COMPLETED".equalsIgnoreCase(status)) {
+            verifications.remove(phone);
+            return true;
+        }
+
+        // Keep the session available for a retry if the provider rejected
+        // the code or returned an unexpected status.
+        return false;
+
+    } catch (RestClientResponseException e) {
+        log.error(
+                "Message Central OTP verification HTTP error: {}",
+                e.getStatusCode().value()
+        );
+
+        // Don't disguise a provider/API failure as an incorrect OTP.
+        throw new IllegalStateException(
+                "Message Central verification request failed (HTTP "
+                        + e.getStatusCode().value() + ")."
+        );
+
+    } catch (Exception e) {
+        log.error(
+                "Unexpected error during Message Central OTP verification: {}",
+                e.getClass().getSimpleName()
+        );
+
+        throw new IllegalStateException(
+                "Could not verify the OTP with Message Central."
+        );
+    }
+}
+
 }
