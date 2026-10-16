@@ -233,22 +233,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <button
+          <button className="cta"
             type="button"
             onClick={() => navigate("/booking-history")}
-            style={{
-              width: "100%",
-              marginTop: 12,
-              padding: "14px 18px",
-              border: "1px solid rgba(255,255,255,0.35)",
-              borderRadius: 10,
-              background: "transparent",
-              color: "inherit",
-              font: "inherit",
-              fontWeight: 600,
-              cursor: "pointer",
-              textAlign: "left",
-            }}
+
           >
             Booking History <span style={{ float: "right" }}>→</span>
           </button>
