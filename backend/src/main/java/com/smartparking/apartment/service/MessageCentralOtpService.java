@@ -257,7 +257,7 @@ public class MessageCentralOtpService {
 
         String url = UriComponentsBuilder
                 .fromHttpUrl(
-                        BASE_URL + "/verification/v3/validateOtp/")
+                                BASE_URL + "/verification/v3/validateOtp")
                 .queryParam("verificationId", verification.id())
                 .queryParam("code", code)
                 .queryParam("flowType", "SMS")
